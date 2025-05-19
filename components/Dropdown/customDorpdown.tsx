@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { GLOBAL_STYLES } from '../../styles/styles';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Seleccionar opción' }) => {
     const [visible, setVisible] = useState(false);
@@ -22,8 +23,9 @@ const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Selec
 
     return (
         <View>
-            <Pressable style={GLOBAL_STYLES.input} onPress={() => setVisible(true)}>
+            <Pressable style={[GLOBAL_STYLES.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]} onPress={() => setVisible(true)}>
                 <Text style={selected ? {} : { color: "#5f5b5b" }}>{selected || placeholder}</Text>
+                <AntDesign name="down" size={15} color="black" />
             </Pressable>
 
             <Modal

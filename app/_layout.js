@@ -1,22 +1,24 @@
-import { Slot } from "expo-router";
+import {  Stack } from "expo-router";
 import { StyleSheet, View } from "react-native";
-import Constants  from "expo-constants";
+import { persistor, userStore } from "../redux/user/userStore";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 export default function Layout() {
     return (
-        <View  style={styles.layoutContainer}>
-            <Slot />
-        </View>
+        <Provider store={userStore}>
+            <PersistGate loading={null} persistor={persistor}>
+                <View  style={styles.layoutContainer}>
+                    <Stack screenOptions={{
+                        headerShown: false}} />
+                </View>
+            </PersistGate>
+        </Provider>
     )
     
 }
 const styles = StyleSheet.create({
     layoutContainer: {
-        flex: 1,
-        backgroundColor: '#09f',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: Constants.statusBarHeight,
-        paddingBottom: Constants.statusBarHeight,
+        flex: 1
     }
 })
