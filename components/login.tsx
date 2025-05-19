@@ -24,12 +24,11 @@ export default function Login() {
 
     const loginFetch = async () => {
         await login(email, password).then(response => {
-            console.log("\n\n\n\n", response, "\n\n\n\n");
             if (response.status >= 200 && response.status < 300) {
-                Alert.alert("Inicio de sesión", "inicio de sesión exitoso", [{ text: "OK", onPress: () => console.log("") }]);
+                Alert.alert("Inicio de sesión", "inicio de sesión exitoso", [{ text: "OK" }]);
                 router.push("/home");
             } else {
-                Alert.alert("Inicio de sesión", "Error al iniciar sesión", [{ text: "OK", onPress: () => console.log("") }]);
+                Alert.alert("Inicio de sesión", "Error al iniciar sesión", [{ text: "OK" }]);
             }
 
         })

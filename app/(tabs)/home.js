@@ -13,10 +13,10 @@ export default function Home() {
 
         setPosts([
             {
-            id: 1,
+            id: 0,
             titulo: "Reparación de lavadora",
             descripcion: "Necesito ayuda para reparar una lavadora que no enciende. He intentado revisar el cableado y el enchufe, pero todo parece estar en orden. El modelo es relativamente nuevo y dejó de funcionar de repente después de un corte de energía. Agradezco si alguien con experiencia en electrodomésticos puede venir a revisarla y darme un diagnóstico. También agradecería recomendaciones sobre repuestos o si conocen algún lugar confiable para adquirirlos. La lavadora es fundamental para mi familia y necesitamos resolver el problema lo antes posible. Si tienes experiencia en este tipo de reparaciones, por favor contáctame. Estoy dispuesto a pagar por el servicio y a coordinar el horario que más te convenga. ¡Gracias de antemano por tu ayuda!",
-            usuarioId: 101,
+            usuarioId: 0,
             nombreUsuario: "Ana López",
             tipoPublicacion: "Solicitud",
             categoriaServicio: "Electrodomésticos",

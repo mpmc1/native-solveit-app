@@ -10,6 +10,7 @@ export default function CreatePost() {
     const [descripcion, setDescripcion] = useState(null);
     const [tipoPublicacion, setTipoPublicacion] = useState(null);
     const [categoriaServicio, setCategoriaServicio] = useState(null);
+    const [ubicacion, setUbicacion] = useState(null);
 
     const router = useRouter();
 
@@ -21,6 +22,8 @@ export default function CreatePost() {
             setDescripcion(null);
             setTipoPublicacion(null);
             setCategoriaServicio(null);
+            setUbicacion(null);
+
         });
         return unsubscribe;
     } , [navigation]);
@@ -63,12 +66,12 @@ export default function CreatePost() {
                             placeholder="Categoría de servicio"
                         />
 
-                        <CustomDropdown
-                            options={['Medellín', 'Rionegro']}
-                            selected={categoriaServicio}
-                            onSelect={(value) => setCategoriaServicio(value)}
-                            placeholder="Categoría de servicio"
-                        />
+                        <TextInput
+                            style={GLOBAL_STYLES.input}
+                            placeholder="Ubicación"
+                            value={ubicacion}
+                            onChangeText={setUbicacion}
+                        />  
                         <Pressable style={GLOBAL_STYLES.button} onPress={() => {
                             Alert.alert("Publicación creada con éxito", "Tu publicación ha sido creada exitosamente.", [{ text: "OK" }]);
                             router.push("/home");

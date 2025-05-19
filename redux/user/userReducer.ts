@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
-import userSlice from "./userSlice";
+import UserData from "./userSlice";
 
 export const userReducer = combineReducers({
-    userReducer: userSlice
+    UserData: UserData
 })

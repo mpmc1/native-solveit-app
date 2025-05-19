@@ -7,8 +7,8 @@ export default function Requests() {
         <DefaultScreen>
             <ScrollView contentContainerStyle={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <View style={[GLOBAL_STYLES.card, { height: "auto", width: 350 }]}>
-                    <Text style={GLOBAL_STYLES.title}>Solicitudes</Text>
-                    <Text >No hay solicitudes disponibles</Text>
+                    <Text style={GLOBAL_STYLES.title}>Solicitudes recibidas</Text>
+                    <Text >No hay solicitudes disponibles.</Text>
                 </View>
             </ScrollView>
         </DefaultScreen>

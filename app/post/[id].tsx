@@ -1,16 +1,17 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput } from "react-native";
 import { PostStatus } from "../../types/Posts";
 import { GLOBAL_STYLES } from "../../styles/styles";
 import { DefaultScreen } from "../../components/defaultScreen";
-import React, { useState } from "react";
-import { Modal, TextInput } from "react-native";
+import React, { useEffect, useState } from "react";
 import CustomDropdown from "../../components/Dropdown/customDorpdown";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/user/userStore";
 
 const post = {
     id: 1,
     titulo: "Título de ejemplo",
     descripcion: "Necesito ayuda para reparar una lavadora que no enciende. He intentado revisar el cableado y el enchufe, pero todo parece estar en orden. El modelo es relativamente nuevo y dejó de funcionar de repente después de un corte de energía. Agradezco si alguien con experiencia en electrodomésticos puede venir a revisarla y darme un diagnóstico. También agradecería recomendaciones sobre repuestos o si conocen algún lugar confiable para adquirirlos. La lavadora es fundamental para mi familia y necesitamos resolver el problema lo antes posible. Si tienes experiencia en este tipo de reparaciones, por favor contáctame. Estoy dispuesto a pagar por el servicio y a coordinar el horario que más te convenga. ¡Gracias de antemano por tu ayuda!",
-    usuarioId: 2,
+    usuarioId: 0,
     nombreUsuario: "UsuarioEjemplo",
     tipoPublicacion: "Servicio",
     categoriaServicio: "Electricidad",
@@ -23,8 +24,14 @@ const post = {
 
 export default function PostDetail() {
     const [modalVisible, setModalVisible] = useState(false);
-        const [reportDescription, setReportDescription] = useState(null);
-        const [reportReason, setReportReason] = useState("");
+    const [reportDescription, setReportDescription] = useState(null);
+    const [reportReason, setReportReason] = useState("");
+
+    const { id } = useSelector((state: RootState) => state.UserData);
+
+    useEffect(() => { console.log("current user: ", id, "\nPost user: ", post.usuarioId); }, [id]);
+
+
 
     function openReportModal() {
         setModalVisible(true);
@@ -59,11 +66,18 @@ export default function PostDetail() {
                     <Text style={styles.label}>Actualizado:</Text>
                     <Text style={styles.text}>{post.fechaActualizacion.toLocaleString()}</Text>
                     <View style={{ height: 10 }} />
-                    <View style={styles.buttonContainer}>
-                        <Pressable style={GLOBAL_STYLES.button} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
-                        <View style={{ height: 10 }} />
-                        <Pressable style={[GLOBAL_STYLES.button, {backgroundColor:"#ff194b"}]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
-                    </View>
+                    {id !== post.usuarioId && post.estado === PostStatus.PUBLICADA && (
+                        <View style={styles.buttonContainer}>
+                            <Pressable style={GLOBAL_STYLES.button} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
+                            <View style={{ height: 10 }} />
+                            <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
+                        </View>)
+                    }
+                    {id === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
+                        <View style={styles.buttonContainer}>
+                            <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} ><Text style={GLOBAL_STYLES.buttonText}> Eliminar publicación </Text></Pressable>
+                        </View>)
+                    }
                 </View>
             </ScrollView>
             <Modal

@@ -1,8 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserModel } from "../../types/autuh";
 import { PURGE } from "redux-persist";
 
-const initialState: UserModel = {
+export interface UserData {
+    id: number,
+    username: string,
+    password: string,
+    email: string,
+    nombreCompleto: string,
+    numeroIdentificacion: string,
+    tipoIdentificacion: string,
+    descripcionPerfil: string,
+    telefono: string,
+}
+
+const initialState: UserData = {
+    id: 0,
     username: "",
     password: "",
     email: "",
@@ -13,8 +25,8 @@ const initialState: UserModel = {
     telefono: "",
 };
 
-export const userSlice = createSlice({
-    name: "userSilce",
+export const UserData = createSlice({
+    name: "UserData",
     initialState: initialState,
     reducers: {
         setUser: (state, action) => {
@@ -30,5 +42,5 @@ export const userSlice = createSlice({
     }
 });
 
-export const { setUser, clearUser } = userSlice.actions;
-export default userSlice.reducer;
+export const { setUser, clearUser } = UserData.actions;
+export default UserData.reducer;

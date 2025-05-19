@@ -1,8 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { configureStore } from "@reduxjs/toolkit";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE } from "redux-persist";
-import { userReducer } from "./userReduce";
+import { userReducer } from "./userReducer";
 import persistStore from "redux-persist/es/persistStore";
 
 const persistedReducer = persistReducer({ key: "root", version: 1, storage: AsyncStorage }, userReducer);
