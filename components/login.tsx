@@ -1,18 +1,18 @@
-import { Link, useNavigation, useRouter } from "expo-router";
+import { Link, Redirect, useNavigation, useRouter } from "expo-router";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { GLOBAL_STYLES } from "../styles/styles";
 import { DefaultScreen } from "./defaultScreen";
 import { useEffect, useState } from "react";
-import { login } from "../services/auth";
+import { useAuth } from "../context/authContext";
 
 export default function Login() {
 
     const [email, setEmail] = useState<string>(null);
     const [password, setPassword] = useState<string>(null);
 
-    const router = useRouter();
-
     const navigation = useNavigation();
+
+    const { signin, isSessionActive } = useAuth();
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('blur', () => {
@@ -22,18 +22,12 @@ export default function Login() {
         return unsubscribe;
     }, [navigation]);
 
-    const loginFetch = async () => {
-        await login(email, password).then(response => {
-            if (response.status >= 200 && response.status < 300) {
-                Alert.alert("Inicio de sesión", "inicio de sesión exitoso", [{ text: "OK" }]);
-                router.push("/home");
-            } else {
-                Alert.alert("Inicio de sesión", "Error al iniciar sesión", [{ text: "OK" }]);
-            }
-
-        })
-
+    const handleLogin = async () => {
+        signin(email, password);
     }
+
+    if (isSessionActive) return (<Redirect href="/home" />);
+
     return (
         <>
             <DefaultScreen>
@@ -42,7 +36,7 @@ export default function Login() {
                         <Text style={GLOBAL_STYLES.title}>Bienvenido a SolveIt</Text>
                         <TextInput value={email} onChangeText={setEmail} style={GLOBAL_STYLES.input} placeholder="Correo" keyboardType="email-address" autoComplete="email" inputMode="email" />
                         <TextInput value={password} onChangeText={setPassword} style={GLOBAL_STYLES.input} placeholder="Contraseña" secureTextEntry={true} autoComplete="password" inputMode="text" />
-                        <Pressable style={GLOBAL_STYLES.button} onPress={loginFetch} ><Text style={GLOBAL_STYLES.buttonText}> Iniciar sesión </Text></Pressable>
+                        <Pressable style={GLOBAL_STYLES.button} onPress={handleLogin} ><Text style={GLOBAL_STYLES.buttonText}> Iniciar sesión </Text></Pressable>
                     </View>
                     <View>
                         <Text>¿No tienes cuenta? <Link href="/register" asChild ><Text style={{ color: '#007BFF' }}>Regístrate</Text></Link></Text>

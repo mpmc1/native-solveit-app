@@ -1,45 +1,64 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput } from "react-native";
-import { PostStatus } from "../../types/Posts";
-import { GLOBAL_STYLES } from "../../styles/styles";
-import { DefaultScreen } from "../../components/defaultScreen";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput, TouchableOpacity, Image } from "react-native";
+import { PostStatus } from "../../../types/Posts";
+import { GLOBAL_STYLES } from "../../../styles/styles";
+import { DefaultScreen } from "../../../components/defaultScreen";
 import React, { useEffect, useState } from "react";
-import CustomDropdown from "../../components/Dropdown/customDorpdown";
+import CustomDropdown from "../../../components/Dropdown/customDorpdown";
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/user/userStore";
+import { RootState } from "../../../redux/user/userStore";
 
 const post = {
     id: 1,
     titulo: "Título de ejemplo",
     descripcion: "Necesito ayuda para reparar una lavadora que no enciende. He intentado revisar el cableado y el enchufe, pero todo parece estar en orden. El modelo es relativamente nuevo y dejó de funcionar de repente después de un corte de energía. Agradezco si alguien con experiencia en electrodomésticos puede venir a revisarla y darme un diagnóstico. También agradecería recomendaciones sobre repuestos o si conocen algún lugar confiable para adquirirlos. La lavadora es fundamental para mi familia y necesitamos resolver el problema lo antes posible. Si tienes experiencia en este tipo de reparaciones, por favor contáctame. Estoy dispuesto a pagar por el servicio y a coordinar el horario que más te convenga. ¡Gracias de antemano por tu ayuda!",
-    usuarioId: 0,
+    usuarioId: 2,
     nombreUsuario: "UsuarioEjemplo",
     tipoPublicacion: "Servicio",
     categoriaServicio: "Electricidad",
     zonaId: 3,
     ubicacionCompleta: "Ciudad, Barrio, Calle 123",
-    estado: PostStatus.PUBLICADA,
+    estado: PostStatus.COMPLETADA,
     fechaCreacion: new Date(),
     fechaActualizacion: new Date(),
 };
 
 export default function PostDetail() {
-    const [modalVisible, setModalVisible] = useState(false);
+    const [reportModalVisible, setReportModalVisible] = useState(false);
     const [reportDescription, setReportDescription] = useState(null);
     const [reportReason, setReportReason] = useState("");
+    const [ratingModalVisible, setRatingModalVisible] = useState(false);
+    const [rating, setRating] = useState(0);
 
-    const { id } = useSelector((state: RootState) => state.UserData);
+    const { email } = useSelector((state: RootState) => state.UserData);
 
-    useEffect(() => { console.log("current user: ", id, "\nPost user: ", post.usuarioId); }, [id]);
+    useEffect(() => { console.log("current user: ", "\nPost user: ", post.usuarioId); }, []);
 
 
 
     function openReportModal() {
-        setModalVisible(true);
+        setReportModalVisible(true);
     }
 
     function closeReportModal() {
-        setModalVisible(false);
+        setReportModalVisible(false);
         setReportDescription("");
+    }
+    function openRatingModal() {
+        setRatingModalVisible(true);
+    }
+
+    function closeRatingModal() {
+        setRatingModalVisible(false);
+        setRating(0);
+    }
+
+    function handleSetRating(value: number) {
+        setRating(value);
+    }
+
+    function handleSubmitRating() {
+        Alert.alert("¡Gracias!", `Calificación enviada: ${rating} estrellas`);
+        closeRatingModal();
     }
 
 
@@ -66,22 +85,71 @@ export default function PostDetail() {
                     <Text style={styles.label}>Actualizado:</Text>
                     <Text style={styles.text}>{post.fechaActualizacion.toLocaleString()}</Text>
                     <View style={{ height: 10 }} />
-                    {id !== post.usuarioId && post.estado === PostStatus.PUBLICADA && (
+                    {post.estado === PostStatus.COMPLETADA && (
                         <View style={styles.buttonContainer}>
-                            <Pressable style={GLOBAL_STYLES.button} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
-                            <View style={{ height: 10 }} />
-                            <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
-                        </View>)
-                    }
-                    {id === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
+                            <Pressable style={GLOBAL_STYLES.button} onPress={openRatingModal}>
+                                <Text style={GLOBAL_STYLES.buttonText}> Calificar </Text>
+                            </Pressable>
+                        </View>
+                    )}
+                    {/* {id !== post.usuarioId && post.estado === PostStatus.PUBLICADA && ( */}
+                    <View style={styles.buttonContainer}>
+                        <Pressable style={GLOBAL_STYLES.button} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
+                        <View style={{ height: 10 }} />
+                        <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
+                    </View>
+                    {/* {id === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
                         <View style={styles.buttonContainer}>
                             <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} ><Text style={GLOBAL_STYLES.buttonText}> Eliminar publicación </Text></Pressable>
                         </View>)
-                    }
+                    } */}
                 </View>
             </ScrollView>
             <Modal
-                visible={modalVisible}
+                visible={ratingModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={closeRatingModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.ratingModalContent}>
+                        <Text style={{ fontWeight: "bold", fontSize: 18, marginBottom: 16, textAlign: "center" }}>
+                            Califica el servicio
+                        </Text>
+                        <View style={styles.starsRow}>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <TouchableOpacity key={star} onPress={() => handleSetRating(star)}>
+                                    <Image
+                                        source={
+                                            rating >= star
+                                                ? require("../../../assets/star-filled.png")
+                                                : require("../../../assets/star-outline.png")
+                                        }
+                                        style={styles.starIcon}
+                                    />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 24 }}>
+                            <Pressable
+                                style={[GLOBAL_STYLES.button, { flex: 1, marginRight: 8 }]}
+                                onPress={handleSubmitRating}
+                                disabled={rating === 0}
+                            >
+                                <Text style={GLOBAL_STYLES.buttonText}>Calificar</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[GLOBAL_STYLES.button, { backgroundColor: "#aaa", flex: 1, marginLeft: 8 }]}
+                                onPress={closeRatingModal}
+                            >
+                                <Text style={GLOBAL_STYLES.buttonText}>Cancelar</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                visible={reportModalVisible}
                 animationType="slide"
                 transparent={true}
                 onRequestClose={closeReportModal}
@@ -184,5 +252,30 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginTop: 8,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    ratingModalContent: {
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        padding: 24,
+        width: "85%",
+        elevation: 5,
+        alignItems: "center"
+    },
+    starsRow: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginVertical: 8,
+    },
+    starIcon: {
+        width: 40,
+        height: 40,
+        marginHorizontal: 4,
     },
 });

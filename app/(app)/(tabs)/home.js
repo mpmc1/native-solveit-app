@@ -1,13 +1,19 @@
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { GLOBAL_STYLES } from "../../styles/styles";
 import { useEffect, useState } from "react";
-import { PostCard } from "../../components/PostCard";
-import { Link } from "expo-router";
+import { Link, useNavigation } from "expo-router";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Constants from "expo-constants";
+import { GLOBAL_STYLES } from "../../../styles/styles";
+import { PostCard } from "../../../components/PostCard";
 
 export default function Home() { 
     const [posts, setPosts] = useState(null);
+
+    const navigation = useNavigation();
+        
+        useEffect(() => {
+            navigation.canGoBack(false);
+        }, []);
     
     useEffect(() => { 
 
@@ -143,12 +149,12 @@ export default function Home() {
 
 
     return (
-        <View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', paddingTop: Constants.statusBarHeight,
-                paddingBottom: Constants.statusBarHeight,}}>
+        <View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', paddingTop: Constants.statusBarHeight}}>
             <View style={styles.topBar}>
                 <TextInput style={styles.searchInput} inputMode="text">Buscar</TextInput>
             </View>
             <View style={styles.content}>
+                <Link href="/chat/0">Ir a chat</Link>
                 <Text style={[GLOBAL_STYLES.title, { marginTop: 20 }]}>Publicaciones disponibles</Text>
                 
                 {posts ? (

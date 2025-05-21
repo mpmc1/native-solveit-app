@@ -1,20 +1,26 @@
-import { Alert, Button, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useEffect, useState } from "react";
 import CustomDropdown from "../components/Dropdown/customDorpdown";
 import { GLOBAL_STYLES } from "../styles/styles";
 import { DefaultScreen } from "../components/defaultScreen";
 import { register } from "../services/auth";
 import { useNavigation, useRouter } from "expo-router";
+import { ErrorResponse, RegisterResponse } from "../types/auth";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/user/userSlice";
+
 
 export default function Register() {
-    const [selectedIdType, setSelectedIdType] = useState(null);
-    const [fullName, setFullName] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [phone, setPhone] = useState(null);
-    const [password, setPassword] = useState(null);
-    const [confirmPassword, setConfirmPassword] = useState(null);
-    const [idNumber, setIdNumber] = useState(null);
-    const [description, setDescription] = useState(null);
+    const [selectedIdType, setSelectedIdType] = useState<string>(null);
+    const [fullName, setFullName] = useState<string>(null);
+    const [email, setEmail] = useState<string>(null);
+    const [phone, setPhone] = useState<string>(null);
+    const [password, setPassword] = useState<string>(null);
+    const [confirmPassword, setConfirmPassword] = useState<string>(null);
+    const [idNumber, setIdNumber] = useState<string>(null);
+    const [description, setDescription] = useState<string>(null);
+
+    const dispatch = useDispatch();
 
     const router = useRouter();
 
@@ -32,10 +38,33 @@ export default function Register() {
             setSelectedIdType(null);
         });
         return unsubscribe;
-  }, [navigation]);
+    }, [navigation]);
 
     const userRegister = async () => {
-        // Validate inputs
+
+
+        if (!fullName || fullName === "" || !email || email == "" || !phone || phone === "" || !password || password === "" || !confirmPassword || confirmPassword === "" || !idNumber || idNumber === "" || !selectedIdType || selectedIdType === "") {
+            Alert.alert("Por favor, completa todos los campos.", "Asegúrate de que no haya campos vacíos.", [
+                { text: "OK" },
+            ]);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            Alert.alert("Las contraseñas no coinciden.", "Por favor, verifica e intenta de nuevo.", [
+                { text: "OK", onPress: () => setConfirmPassword("") },
+            ]);
+            return;
+        }
+        const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+
+        const isValid = regex.test(password);
+
+        if (!isValid) {
+            Alert.alert("La contraseña no cumple con las condiciones", "La contraseña debe tener mínimo un número, una letra en mayúscula, un caracter especial (*,!,\",#,$,%,$,@,^,(,). y por lo menos 8 caracteres)", [{ text: "Ok" }]);
+            return;
+        }
+
         const bodyRequest = {
             username: email,
             password: password,
@@ -46,34 +75,31 @@ export default function Register() {
             descripcionPerfil: description,
             telefono: phone,
         }
-        
-        if (!fullName || fullName === "" || !email || email == "" || !phone || phone === "" || !password || password === "" || !confirmPassword || confirmPassword === "" || !idNumber || idNumber === "" || !selectedIdType || selectedIdType === "") {
-            Alert.alert("Por favor, completa todos los campos.", "Asegúrate de que no haya campos vacíos.", [
-                { text: "OK" },
-            ]);
-            return;
-        }
+        await register(bodyRequest).then(async (response) => {
+            const json = await response.json();
 
-        if (password !== confirmPassword) {
-            Alert.alert("Las contraseñas no coinciden.","Por favor, verifica e intenta de nuevo.", [
-                { text: "OK", onPress: () => setConfirmPassword("") },
-            ]);
-            return;
-        }
-        
-        await register(bodyRequest).then((response) => {
-            
-            if (response.status>=200 && response.status<300) {
+            if (response.status >= 200 && response.status < 300 && json.token) {
+                dispatch(setUser({
+                    token: json.token,
+                    username: json.username,
+                    password: password,
+                    email: json.email,
+                    nombreCompleto: json.nombreCompleto,
+                    numeroIdentificacion: json.numeroIdentificacion,
+                    tipoIdentificacion: json.tipoIdentificacion,
+                    descripcionPerfil: json.descripcionPerfil,
+                    telefono: json.telefono
+                }));
                 Alert.alert("Usuario registrado con éxito", '', [{ text: 'OK' }]);
-                router.push("/");
+                router.push("/home");
             } else {
-                Alert.alert("Error al registrar el usuario."," Por favor, inténtalo de nuevo más tarde.", '', [{ text: 'OK' }]);
+                Alert.alert("Error al registrar el usuario.", json.message, [{ text: 'OK' }]);
                 return;
             }
-            
+
         }).catch((error) => {
             console.log(error);
-            Alert.alert("Error al registrar el usuario."," Por favor, inténtalo de nuevo más tarde.", [{ text: 'OK' }]);
+            Alert.alert("Error al registrar el usuario.", " Por favor, inténtalo de nuevo más tarde.", [{ text: 'OK' }]);
         });
     }
 
@@ -100,18 +126,18 @@ export default function Register() {
                 </View>
             </ScrollView>
         </DefaultScreen>
-    
+
     )
 }
 const styles = StyleSheet.create({
     formContainer: {
-    flex: 1,
-    justifyContent: 'start',
-    alignItems: 'center',
-    backgroundColor: '#f5fcff',
-    minHeight: 550,
-    width: 300,
-    borderRadius: 10,
-    padding: 20,
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        backgroundColor: '#f5fcff',
+        minHeight: 550,
+        width: 300,
+        borderRadius: 10,
+        padding: 20,
     },
 });

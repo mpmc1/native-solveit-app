@@ -1,21 +1,21 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { GLOBAL_STYLES } from "../../styles/styles";
-import { DefaultScreen } from "../../components/defaultScreen";
 import { useEffect, useState } from "react";
-import CustomDropdown from "../../components/Dropdown/customDorpdown";
 import { useNavigation, useRouter } from "expo-router";
+import { DefaultScreen } from "../../../components/defaultScreen";
+import { GLOBAL_STYLES } from "../../../styles/styles";
+import CustomDropdown from "../../../components/Dropdown/customDorpdown";
 
 export default function CreatePost() {
-    const [titulo, setTitulo] = useState(null);
-    const [descripcion, setDescripcion] = useState(null);
-    const [tipoPublicacion, setTipoPublicacion] = useState(null);
-    const [categoriaServicio, setCategoriaServicio] = useState(null);
-    const [ubicacion, setUbicacion] = useState(null);
+    const [titulo, setTitulo] = useState<string>(null);
+    const [descripcion, setDescripcion] = useState<string>(null);
+    const [tipoPublicacion, setTipoPublicacion] = useState<string>(null);
+    const [categoriaServicio, setCategoriaServicio] = useState<string>(null);
+    const [ubicacion, setUbicacion] = useState<string>(null);
 
     const router = useRouter();
 
     const navigation = useNavigation();
-    
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('blur', () => {
             setTitulo(null);
@@ -26,7 +26,7 @@ export default function CreatePost() {
 
         });
         return unsubscribe;
-    } , [navigation]);
+    }, [navigation]);
 
 
 
@@ -57,8 +57,8 @@ export default function CreatePost() {
                             selected={tipoPublicacion}
                             onSelect={(value) => setTipoPublicacion(value)}
                             placeholder="Tipo de publicación"
-                            />
-                            
+                        />
+
                         <CustomDropdown
                             options={['Jardinería', 'Hogar']}
                             selected={categoriaServicio}
@@ -71,11 +71,11 @@ export default function CreatePost() {
                             placeholder="Ubicación"
                             value={ubicacion}
                             onChangeText={setUbicacion}
-                        />  
+                        />
                         <Pressable style={GLOBAL_STYLES.button} onPress={() => {
                             Alert.alert("Publicación creada con éxito", "Tu publicación ha sido creada exitosamente.", [{ text: "OK" }]);
                             router.push("/home");
-                                }}>
+                        }}>
                             <Text style={GLOBAL_STYLES.buttonText}>Crear publicación</Text>
                         </Pressable>
                     </View>
@@ -88,7 +88,7 @@ export default function CreatePost() {
 const styles = StyleSheet.create({
     formContainer: {
         flex: 1,
-        justifyContent: 'start',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: '#f5fcff',
         maxHeight: 500,

@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { PURGE } from "redux-persist";
 
 export interface UserData {
-    id: number,
+    token: string,
     username: string,
     password: string,
     email: string,
@@ -14,7 +14,7 @@ export interface UserData {
 }
 
 const initialState: UserData = {
-    id: 0,
+    token: "",
     username: "",
     password: "",
     email: "",

@@ -5,10 +5,8 @@ import {
     View,
     Text,
     Pressable,
-    Modal,
-    FlatList,
     StyleSheet,
-    TouchableOpacity,
+    ScrollView,
 } from 'react-native';
 import { GLOBAL_STYLES } from '../../styles/styles';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -16,42 +14,32 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Seleccionar opción' }) => {
     const [visible, setVisible] = useState(false);
 
+    const handleSetVisible = () => {
+        setVisible(!visible)
+    }
+
     const handleSelect = (option) => {
-        onSelect(option); // comunicamos la selección al padre
+        onSelect(option);
         setVisible(false);
     };
 
     return (
         <View>
-            <Pressable style={[GLOBAL_STYLES.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]} onPress={() => setVisible(true)}>
+            <Pressable style={[GLOBAL_STYLES.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]} onPress={() => setVisible(!visible)}>
                 <Text style={selected ? {} : { color: "#5f5b5b" }}>{selected || placeholder}</Text>
                 <AntDesign name="down" size={15} color="black" />
             </Pressable>
-
-            <Modal
-                transparent
-                animationType="fade"
-                visible={visible}
-                onRequestClose={() => setVisible(false)}
-            >
-                <TouchableOpacity
-                    style={styles.modalOverlay}
-                    activeOpacity={1}
-                    onPressOut={() => setVisible(false)}
-                >
-                    <View style={styles.dropdownContainer}>
-                        <FlatList
-                            data={options}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item }) => (
-                                <Pressable style={styles.option} onPress={() => handleSelect(item)}>
-                                    <Text>{item}</Text>
-                                </Pressable>
-                            )}
-                        />
-                    </View>
-                </TouchableOpacity>
-            </Modal>
+            {visible && (
+                <View style={styles.dropdownAbsolute}>
+                    <ScrollView style={styles.dropdownContainer}>
+                        {options.map((item, idx) => (
+                            <Pressable key={idx} style={styles.option} onPress={() => handleSelect(item)}>
+                                <Text>{item}</Text>
+                            </Pressable>
+                        ))}
+                    </ScrollView>
+                </View>
+            )}
         </View>
     );
 };
@@ -59,13 +47,16 @@ const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Selec
 export default CustomDropdown;
 
 const styles = StyleSheet.create({
-    modalOverlay: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+    dropdownAbsolute: {
+        position: 'absolute',
+        top: 40,
+        left: 0,
+        width: '100%',
+        zIndex: 100,
+        elevation: 10,
     },
     dropdownContainer: {
-        width: 200,
+        maxHeight: 100,
         backgroundColor: '#ebeded',
         borderRadius: 6,
         paddingVertical: 8,
