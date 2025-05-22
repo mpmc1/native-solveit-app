@@ -14,10 +14,6 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Seleccionar opción' }) => {
     const [visible, setVisible] = useState(false);
 
-    const handleSetVisible = () => {
-        setVisible(!visible)
-    }
-
     const handleSelect = (option) => {
         onSelect(option);
         setVisible(false);

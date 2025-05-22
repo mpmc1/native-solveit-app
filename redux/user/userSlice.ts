@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PURGE } from "redux-persist";
 
-export interface UserData {
+export interface UserDataModel {
     token: string,
     username: string,
     password: string,
@@ -13,16 +13,16 @@ export interface UserData {
     telefono: string,
 }
 
-const initialState: UserData = {
-    token: "",
-    username: "",
-    password: "",
-    email: "",
-    nombreCompleto: "",
-    numeroIdentificacion: "",
-    tipoIdentificacion: "",
-    descripcionPerfil: "",
-    telefono: "",
+const initialState: UserDataModel = {
+    token: null,
+    username: null,
+    password: null,
+    email: null,
+    nombreCompleto: null,
+    numeroIdentificacion: null,
+    tipoIdentificacion: null,
+    descripcionPerfil: null,
+    telefono: null,
 };
 
 export const UserData = createSlice({
@@ -35,6 +35,7 @@ export const UserData = createSlice({
         },
         clearUser: (state) => {
             state = initialState
+            return state
         }
     },
     extraReducers: (builder) => {
@@ -43,4 +44,4 @@ export const UserData = createSlice({
 });
 
 export const { setUser, clearUser } = UserData.actions;
-export default UserData.reducer;
+export default UserData;

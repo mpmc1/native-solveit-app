@@ -1,11 +1,9 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput, TouchableOpacity, Image } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput, TouchableOpacity, Image, Platform } from "react-native";
 import { PostStatus } from "../../../types/Posts";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
 import React, { useEffect, useState } from "react";
 import CustomDropdown from "../../../components/Dropdown/customDorpdown";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/user/userStore";
 
 const post = {
     id: 1,
@@ -28,8 +26,6 @@ export default function PostDetail() {
     const [reportReason, setReportReason] = useState("");
     const [ratingModalVisible, setRatingModalVisible] = useState(false);
     const [rating, setRating] = useState(0);
-
-    const { email } = useSelector((state: RootState) => state.UserData);
 
     useEffect(() => { console.log("current user: ", "\nPost user: ", post.usuarioId); }, []);
 
@@ -57,7 +53,8 @@ export default function PostDetail() {
     }
 
     function handleSubmitRating() {
-        Alert.alert("¡Gracias!", `Calificación enviada: ${rating} estrellas`);
+        if (Platform.OS === 'web') alert(`Calificación enviada: ${rating} estrellas`)
+        else Alert.alert("¡Gracias!", `Calificación enviada: ${rating} estrellas`);
         closeRatingModal();
     }
 
@@ -196,7 +193,8 @@ export default function PostDetail() {
                             <Pressable
                                 style={[GLOBAL_STYLES.button, { flex: 1, marginRight: 8 }]}
                                 onPress={() => {
-                                    Alert.alert("Reporte enviado", "Gracias por ayudarnos a mantener la comunidad segura.");
+                                    if (Platform.OS === "web") alert("Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.");
+                                    else Alert.alert("Reporte enviado", "Gracias por ayudarnos a mantener la comunidad segura.");
                                     closeReportModal();
                                 }}
                             >

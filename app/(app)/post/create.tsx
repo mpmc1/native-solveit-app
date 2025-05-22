@@ -1,4 +1,4 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import { DefaultScreen } from "../../../components/defaultScreen";
@@ -73,7 +73,8 @@ export default function CreatePost() {
                             onChangeText={setUbicacion}
                         />
                         <Pressable style={GLOBAL_STYLES.button} onPress={() => {
-                            Alert.alert("Publicación creada con éxito", "Tu publicación ha sido creada exitosamente.", [{ text: "OK" }]);
+                            if (Platform.OS === "web") alert("Tu publicación ha sido creada exitosamente.");
+                            else Alert.alert("Publicación creada con éxito", "Tu publicación ha sido creada exitosamente.", [{ text: "OK" }]);
                             router.push("/home");
                         }}>
                             <Text style={GLOBAL_STYLES.buttonText}>Crear publicación</Text>

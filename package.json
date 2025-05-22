@@ -2,6 +2,18 @@
   "name": "solveit",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "jwt-decode",
+          "redux-persist",
+          "dotenv",
+          "redux-saga"
+        ]
+      }
+    }
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -13,6 +25,7 @@
     "@expo/metro-runtime": "~5.0.4",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@reduxjs/toolkit": "^2.8.2",
+    "dotenv": "^16.5.0",
     "expo": "~53.0.9",
     "expo-constants": "~17.1.6",
     "expo-document-picker": "~13.1.5",
@@ -43,5 +56,6 @@
     "tailwindcss": "3.2.2",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }

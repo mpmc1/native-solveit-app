@@ -1,11 +1,10 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useEffect, useState } from "react";
 import CustomDropdown from "../components/Dropdown/customDorpdown";
 import { GLOBAL_STYLES } from "../styles/styles";
 import { DefaultScreen } from "../components/defaultScreen";
 import { register } from "../services/auth";
 import { useNavigation, useRouter } from "expo-router";
-import { ErrorResponse, RegisterResponse } from "../types/auth";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/user/userSlice";
 
@@ -42,18 +41,19 @@ export default function Register() {
 
     const userRegister = async () => {
 
-
-        if (!fullName || fullName === "" || !email || email == "" || !phone || phone === "" || !password || password === "" || !confirmPassword || confirmPassword === "" || !idNumber || idNumber === "" || !selectedIdType || selectedIdType === "") {
-            Alert.alert("Por favor, completa todos los campos.", "Asegúrate de que no haya campos vacíos.", [
-                { text: "OK" },
-            ]);
+        if (!fullName || fullName === "" || !email || email === "" || !phone || phone === "" || !password || password === "" || !confirmPassword || confirmPassword === "" || !idNumber || idNumber === "" || !selectedIdType || selectedIdType === "") {
+            const alertTitleEmptyFields = "Por favor, completa todos los campos.";
+            const alertMessageEmptyFields = "Asegúrate que no haya campos vacíos.";
+            if (Platform.OS === 'web') alert(alertMessageEmptyFields)
+            else Alert.alert(alertTitleEmptyFields, alertMessageEmptyFields, [{ text: "OK" },]);
             return;
         }
 
         if (password !== confirmPassword) {
-            Alert.alert("Las contraseñas no coinciden.", "Por favor, verifica e intenta de nuevo.", [
-                { text: "OK", onPress: () => setConfirmPassword("") },
-            ]);
+            const differentPasswordsAlertTitle = "Las contraseñas no coinciden."
+            const differentPasswordsAlertMessage = "Por favor, verifica e intenta de nuevo.";
+            if (Platform.OS === 'web') alert(differentPasswordsAlertTitle)
+            else Alert.alert(differentPasswordsAlertTitle, differentPasswordsAlertMessage, [{ text: "OK" },]);
             return;
         }
         const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
@@ -61,7 +61,10 @@ export default function Register() {
         const isValid = regex.test(password);
 
         if (!isValid) {
-            Alert.alert("La contraseña no cumple con las condiciones", "La contraseña debe tener mínimo un número, una letra en mayúscula, un caracter especial (*,!,\",#,$,%,$,@,^,(,). y por lo menos 8 caracteres)", [{ text: "Ok" }]);
+            const passwordConditionsAlertTitle = "La contraseña no cumple con las condiciones";
+            const passwordConditionsAlertMessage = "La contraseña debe tener mínimo un número, una letra en mayúscula, un caracter especial (*,!,\",#,$,%,$,@,^,(,). y por lo menos 8 caracteres)"
+            if (Platform.OS === 'web') alert(passwordConditionsAlertMessage)
+            else Alert.alert(passwordConditionsAlertTitle, passwordConditionsAlertMessage, [{ text: "OK" },]);
             return;
         }
 
@@ -90,16 +93,21 @@ export default function Register() {
                     descripcionPerfil: json.descripcionPerfil,
                     telefono: json.telefono
                 }));
-                Alert.alert("Usuario registrado con éxito", '', [{ text: 'OK' }]);
+                const successUserSignUpAlertTitle = "Usuario registrado con éxito";
+                const successUserSignUpAlertMessage = "Bienvenido a SolveIt";
+                if (Platform.OS === 'web') alert(successUserSignUpAlertMessage)
+                else Alert.alert(successUserSignUpAlertTitle, successUserSignUpAlertTitle, [{ text: "OK" },]);
                 router.push("/home");
             } else {
-                Alert.alert("Error al registrar el usuario.", json.message, [{ text: 'OK' }]);
+                if (Platform.OS === 'web') alert(json.message)
+                else Alert.alert("Error al registrar el usuario.", json.message, [{ text: 'OK' }]);
                 return;
             }
 
         }).catch((error) => {
-            console.log(error);
-            Alert.alert("Error al registrar el usuario.", " Por favor, inténtalo de nuevo más tarde.", [{ text: 'OK' }]);
+            if (Platform.OS === 'web') alert("Hubo un error inesperado. Vuelve a intentar")
+            else Alert.alert("Hubo un error inesperado.", " Vuelve a intentar", [{ text: 'OK' }]);
+            console.error(error);
         });
     }
 

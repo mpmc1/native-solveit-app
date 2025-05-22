@@ -8,6 +8,7 @@ import { PostCard } from "../../../components/PostCard";
 
 export default function Home() { 
     const [posts, setPosts] = useState(null);
+    const [searchValue, setSearchValue] = useState(null);
 
     const navigation = useNavigation();
         
@@ -151,7 +152,7 @@ export default function Home() {
     return (
         <View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', paddingTop: Constants.statusBarHeight}}>
             <View style={styles.topBar}>
-                <TextInput style={styles.searchInput} inputMode="text">Buscar</TextInput>
+                <TextInput placeholder="Buscar" value={searchValue} style={styles.searchInput} inputMode="text" onChangeText={setSearchValue}/>
             </View>
             <View style={styles.content}>
                 <Link href="/chat/0">Ir a chat</Link>

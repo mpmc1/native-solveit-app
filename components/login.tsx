@@ -1,5 +1,5 @@
-import { Link, Redirect, useNavigation, useRouter } from "expo-router";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Link, Redirect, useNavigation } from "expo-router";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { GLOBAL_STYLES } from "../styles/styles";
 import { DefaultScreen } from "./defaultScreen";
 import { useEffect, useState } from "react";
