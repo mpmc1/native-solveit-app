@@ -1,4 +1,4 @@
-import { userStore } from "../redux/user/userStore";
+import { userStore } from "../../redux/user/userStore";
 
 const token = userStore.getState().UserData.token;
 export const PROTECTED_API_HEADRES = {
