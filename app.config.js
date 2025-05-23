@@ -15,9 +15,6 @@ export default {
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
-    ios: {
-      supportsTablet: true
-    },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",

@@ -1,35 +1,33 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput, TouchableOpacity, Image, Platform } from "react-native";
-import { PostStatus } from "../../../types/Posts";
+import { PostModelResponse, PostStatus } from "../../../types/Posts";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
 import React, { useEffect, useState } from "react";
 import CustomDropdown from "../../../components/Dropdown/customDorpdown";
-
-const post = {
-    id: 1,
-    titulo: "Título de ejemplo",
-    descripcion: "Necesito ayuda para reparar una lavadora que no enciende. He intentado revisar el cableado y el enchufe, pero todo parece estar en orden.",
-    usuarioId: 2,
-    nombreUsuario: "UsuarioEjemplo",
-    tipoPublicacion: "Servicio",
-    categoriaServicio: "Electricidad",
-    zonaId: 3,
-    ubicacionCompleta: "Ciudad, Barrio, Calle 123",
-    estado: PostStatus.COMPLETADA,
-    fechaCreacion: new Date(),
-    fechaActualizacion: new Date(),
-};
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { getPostById } from "../../../services/post";
+import { getZoneById } from "../../../services/zone";
+import { ZoneModel } from "../../../types/zone";
 
 export default function PostDetail() {
     const [reportModalVisible, setReportModalVisible] = useState(false);
     const [reportDescription, setReportDescription] = useState(null);
     const [reportReason, setReportReason] = useState("");
     const [ratingModalVisible, setRatingModalVisible] = useState(false);
+    const [post, setPost] = useState<PostModelResponse>(null);
     const [rating, setRating] = useState(0);
+    const [zona, setZona] = useState<ZoneModel>(null);
 
-    useEffect(() => { console.log("current user: ", "\nPost user: ", post.usuarioId); }, []);
 
+    const { id } = useLocalSearchParams<{ id: string }>();
+    const navigation = useNavigation();
 
+    const getPost = React.useCallback(async () => {
+        const response = await getPostById(id);
+        setPost(response);
+        const responseZone = await getZoneById(response.zonaId);
+        setZona(responseZone);
+    }, [id]);
 
     function openReportModal() {
         setReportModalVisible(true);
@@ -59,48 +57,60 @@ export default function PostDetail() {
     }
 
 
+    useEffect(() => {
+        const focus = navigation.addListener('focus', () => {
+            getPost();
+        });
+
+        return focus;
+    }, [navigation, getPost]);
+
+
+
     return (
         <DefaultScreen>
             <ScrollView>
-                <View style={styles.card}>
-                    <Text style={styles.title}>{post.titulo}</Text>
-                    <Text style={styles.label}>Descripción:</Text>
-                    <Text style={styles.text}>{post.descripcion}</Text>
-                    <View style={styles.line} />
-                    <Text style={styles.label}>Publicado por:</Text>
-                    <Text style={styles.text}>{post.nombreUsuario}</Text>
-                    <Text style={styles.label}>Tipo:</Text>
-                    <Text style={styles.text}>{post.tipoPublicacion}</Text>
-                    <Text style={styles.label}>Categoría:</Text>
-                    <Text style={styles.text}>{post.categoriaServicio}</Text>
-                    <Text style={styles.label}>Ubicación:</Text>
-                    <Text style={styles.text}>{post.ubicacionCompleta}</Text>
-                    <Text style={styles.label}>Estado:</Text>
-                    <Text style={styles.text}>{PostStatus[post.estado]}</Text>
-                    <Text style={styles.label}>Creado:</Text>
-                    <Text style={styles.text}>{post.fechaCreacion.toLocaleString()}</Text>
-                    <Text style={styles.label}>Actualizado:</Text>
-                    <Text style={styles.text}>{post.fechaActualizacion.toLocaleString()}</Text>
-                    <View style={{ height: 10 }} />
-                    {post.estado === PostStatus.COMPLETADA && (
-                        <View style={styles.buttonContainer}>
-                            <Pressable style={GLOBAL_STYLES.button} onPress={openRatingModal}>
-                                <Text style={GLOBAL_STYLES.buttonText}> Calificar </Text>
-                            </Pressable>
-                        </View>
-                    )}
-                    {/* {id !== post.usuarioId && post.estado === PostStatus.PUBLICADA && ( */}
-                    <View style={styles.buttonContainer}>
-                        <Pressable style={GLOBAL_STYLES.button} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
+                {post && zona &&
+                    <View style={styles.card}>
+                        <Text style={styles.title}>{post.titulo}</Text>
+                        <Text style={styles.label}>Descripción:</Text>
+                        <Text style={styles.text}>{post.descripcion}</Text>
+                        <View style={styles.line} />
+                        <Text style={styles.label}>Publicado por:</Text>
+                        <Text style={styles.text}>{post.nombreUsuario}</Text>
+                        <Text style={styles.label}>Tipo:</Text>
+                        <Text style={styles.text}>{post.tipoPublicacion}</Text>
+                        <Text style={styles.label}>Categoría:</Text>
+                        <Text style={styles.text}>{post.categoriaServicio}</Text>
+                        <Text style={styles.label}>Zona:</Text>
+                        <Text style={styles.text}>{`${zona.ciudad || zona.municipio || zona.corregimiento}, ${zona.departamento}, ${zona.pais}`}</Text>
+                        <Text style={styles.label}>Estado:</Text>
+                        <Text style={styles.text}>{PostStatus[post.estado]}</Text>
+                        <Text style={styles.label}>Creado:</Text>
+                        <Text style={styles.text}>{new Date(post.fechaCreacion).toLocaleDateString()}</Text>
+                        <Text style={styles.label}>Actualizado:</Text>
+                        <Text style={styles.text}>{new Date(post.fechaActualizacion).toLocaleDateString()}</Text>
                         <View style={{ height: 10 }} />
-                        <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
-                    </View>
-                    {/* {id === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
+                        {post.estado === PostStatus.COMPLETADA && (
+                            <View style={styles.buttonContainer}>
+                                <Pressable style={GLOBAL_STYLES.button} onPress={openRatingModal}>
+                                    <Text style={GLOBAL_STYLES.buttonText}> Calificar </Text>
+                                </Pressable>
+                            </View>
+                        )}
+                        {/* {id !== post.usuarioId && post.estado === PostStatus.PUBLICADA && ( */}
+                        <View style={styles.buttonContainer}>
+                            <Pressable style={GLOBAL_STYLES.button} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
+                            <View style={{ height: 10 }} />
+                            <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
+                        </View>
+                        {/* {id === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
                         <View style={styles.buttonContainer}>
                             <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} ><Text style={GLOBAL_STYLES.buttonText}> Eliminar publicación </Text></Pressable>
                         </View>)
                     } */}
-                </View>
+                    </View>
+                }
             </ScrollView>
             <Modal
                 visible={ratingModalVisible}
@@ -217,6 +227,7 @@ export default function PostDetail() {
 const styles = StyleSheet.create({
     card: {
         backgroundColor: "#fff",
+        width: 350,
         borderRadius: 8,
         padding: 16,
         marginLeft: 10,

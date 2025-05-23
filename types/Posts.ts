@@ -11,27 +11,52 @@ export interface PostModel {
     fechaCreacion: Date,
     fechaActualizacion: Date,
 }
+export interface PostModelResponse {
+    id: number,
+    titulo: string,
+    descripcion: string,
+    usuarioId: number,
+    nombreUsuario: string,
+    tipoPublicacion: string,
+    categoriaServicio: string,
+    zonaId: number,
+    estado: PostStatus,
+    fechaCreacion: string,
+    fechaActualizacion: string,
+}
 
 export enum PostStatus {
-    PUBLICADA,
-    INTERES_RECIBIDO,
-    EN_PROCESO,
-    COMPLETADA,
-    RECHAZADA,
-    REPORTADA,
-    BLOQUEADA,
-    CANCELADA
+    PUBLICADA = "PUBLICADA",
+    INTERES_RECIBIDO = "INTERES_RECIBIDO",
+    EN_PROCESO = "EN_PROCESO",
+    COMPLETADA = "COMPLETADA",
+    RECHAZADA = "RECHAZADA",
+    REPORTADA = "REPORTADA",
+    BLOQUEADA = "BLOQUEADA",
+    CANCELADA = "CANCELADA",
 }
 
 export interface CreatePostRequest {
-    usuarioId: number,
     titulo: string,
     descripcion: string,
-    tipoPublicacion: TipoPublicacion,
+    tipoPublicacion: PostType,
     categoriaServicio: string,
     zonaId: number
 }
-enum TipoPublicacion {
-    OFERTA,
-    DEMANDA
+
+export interface UpdatePostRequest {
+    titulo: string,
+    descripcion: string,
+    tipoPublicacion: PostType,
+    categoriaServicio: string,
+    zonaId: number
+}
+
+export enum PostType {
+    OFERTA = "OFERTA",
+    DEMANDA = "DEMANDA"
+}
+
+export enum PostCategory {
+
 }

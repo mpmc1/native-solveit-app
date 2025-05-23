@@ -1,20 +1,42 @@
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import { DefaultScreen } from "../../../components/defaultScreen";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import CustomDropdown from "../../../components/Dropdown/customDorpdown";
+import { createPost } from "../../../services/post";
+import { PostType } from "../../../types/Posts";
+import { ZoneModel } from "../../../types/zone";
+import { getZone } from "../../../services/zone";
+import CustomAlert from "../../../utils/CustomAlert";
 
 export default function CreatePost() {
     const [titulo, setTitulo] = useState<string>(null);
     const [descripcion, setDescripcion] = useState<string>(null);
-    const [tipoPublicacion, setTipoPublicacion] = useState<string>(null);
+    const [tipoPublicacion, setTipoPublicacion] = useState<PostType>(null);
     const [categoriaServicio, setCategoriaServicio] = useState<string>(null);
-    const [ubicacion, setUbicacion] = useState<string>(null);
+    const [zonaId, setZonaId] = useState<number>(null);
+    const [zonas, setZonas] = useState<ZoneModel[]>([]);
 
     const router = useRouter();
-
     const navigation = useNavigation();
+
+    const createPost = async () => {
+        const result = await createPost({ categoriaServicio, descripcion, tipoPublicacion, titulo, zonaId });
+
+        if (result) {
+            CustomAlert("Publicación creada con éxito", "Tu publicación ha sido creada exitosamente.", "Tu publicación ha sido creada exitosamente.");
+            router.push("/home");
+        }
+    }
+
+    const getZonas = async () => {
+        const response = await getZone();
+        if (response) {
+            setZonas(response);
+        }
+
+    }
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('blur', () => {
@@ -22,11 +44,15 @@ export default function CreatePost() {
             setDescripcion(null);
             setTipoPublicacion(null);
             setCategoriaServicio(null);
-            setUbicacion(null);
-
+            setZonaId(null);
         });
+
         return unsubscribe;
     }, [navigation]);
+
+    useEffect(() => {
+        getZonas();
+    }, []);
 
 
 
@@ -53,7 +79,7 @@ export default function CreatePost() {
                         />
 
                         <CustomDropdown
-                            options={['Oferta', 'Solicitud']}
+                            options={[PostType.OFERTA, PostType.DEMANDA]}
                             selected={tipoPublicacion}
                             onSelect={(value) => setTipoPublicacion(value)}
                             placeholder="Tipo de publicación"
@@ -66,17 +92,15 @@ export default function CreatePost() {
                             placeholder="Categoría de servicio"
                         />
 
-                        <TextInput
-                            style={GLOBAL_STYLES.input}
+                        <CustomDropdown
+                            options={zonas}
+                            selected={zonaId}
+                            onSelect={(value) => setZonaId(value)}
                             placeholder="Ubicación"
-                            value={ubicacion}
-                            onChangeText={setUbicacion}
+                            withId={true}
+                            isZone={true}
                         />
-                        <Pressable style={GLOBAL_STYLES.button} onPress={() => {
-                            if (Platform.OS === "web") alert("Tu publicación ha sido creada exitosamente.");
-                            else Alert.alert("Publicación creada con éxito", "Tu publicación ha sido creada exitosamente.", [{ text: "OK" }]);
-                            router.push("/home");
-                        }}>
+                        <Pressable style={GLOBAL_STYLES.button} onPress={createPost}>
                             <Text style={GLOBAL_STYLES.buttonText}>Crear publicación</Text>
                         </Pressable>
                     </View>

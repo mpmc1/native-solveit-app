@@ -11,18 +11,26 @@ import {
 import { GLOBAL_STYLES } from '../../styles/styles';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Seleccionar opción' }) => {
+const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Seleccionar opción', withId = false, isZone = false }) => {
     const [visible, setVisible] = useState(false);
 
+    const [withIdSelectionText, setWithIdSelectionText] = useState("");
+
+
     const handleSelect = (option) => {
-        onSelect(option);
+        if (withId) {
+            onSelect(option.id);
+            setWithIdSelectionText(`${option.ciudad || option.municipio || option.corregmiento}, ${option.departamento}, ${option.pais}`);
+        } else {
+            onSelect(option);
+        }
         setVisible(false);
     };
 
     return (
         <View>
             <Pressable style={[GLOBAL_STYLES.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]} onPress={() => setVisible(!visible)}>
-                <Text style={selected ? {} : { color: "#5f5b5b" }}>{selected || placeholder}</Text>
+                <Text style={selected ? {} : { color: "#5f5b5b" }}>{(withId ? withIdSelectionText : selected) || placeholder}</Text>
                 <AntDesign name="down" size={15} color="black" />
             </Pressable>
             {visible && (
@@ -30,7 +38,10 @@ const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Selec
                     <ScrollView style={styles.dropdownContainer}>
                         {options.map((item, idx) => (
                             <Pressable key={idx} style={styles.option} onPress={() => handleSelect(item)}>
-                                <Text>{item}</Text>
+                                {isZone
+                                    ? <Text>{item.ciudad || item.municipio || item.corregmiento}, {item.departamento}, {item.pais}</Text>
+                                    : <Text>{item}</Text>
+                                }
                             </Pressable>
                         ))}
                     </ScrollView>

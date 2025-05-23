@@ -1,29 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Image, StyleSheet, Pressable, ScrollView, TouchableOpacity } from "react-native";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
-import { Link } from "expo-router";
+import { Link, useNavigation } from "expo-router";
 import ExpansionPanel from "../../../components/expansion-panel/expansionPanel";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useAuth } from "../../../context/authContext";
 import PolicyModal from "../../../components/Profile/policyModal";
 import UserInfoUpdateModal from "../../../components/Profile/userInfoUpdateModal";
-
-const user = {
-    username: "CarlosM",
-    password: "",
-    email: "carlos@email.com",
-    nombreCompleto: "Carlos Mendez",
-    numeroIdentificacion: "123456789",
-    tipoIdentificacion: "CC",
-    descripcionPerfil: "",
-    telefono: "3200000000",
-};
-
-const posts = [];
+import { getSelfPost } from "../../../services/post";
+import { userStore } from "../../../redux/user/userStore";
 
 export default function Profile() {
+    const user = userStore.getState().UserData;
+    const [posts, setPosts] = useState([])
     const [policyModalVisible, setPolicyModalVisible] = useState(false);
     const [policyForm, setPolicyForm] = useState({
         numeroPoliza: "",
@@ -47,10 +38,14 @@ export default function Profile() {
     });
     const [formEditable, setFormEditable] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-
+    
+    const navigation = useNavigation();
     const { signout } = useAuth();
 
-
+    const getMyPosts = async () => {
+            const result = await getSelfPost();
+            setPosts(result)
+    }
     const handleDeleteAccount = () => {
         setDropdownVisible(false);
         // lógica para eliminar cuenta
@@ -76,6 +71,16 @@ export default function Profile() {
         setDropdownVisible(false);
         setPolicyModalVisible(true);
     };
+
+    
+        useEffect(() => {
+                const focus = navigation.addListener('focus', () => {
+                    getMyPosts();
+                });
+        
+        
+                return focus;
+            }, [navigation]);
 
 
     return (

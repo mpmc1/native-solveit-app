@@ -1,10 +1,35 @@
-import Constants from 'expo-constants';
-import { PROTECTED_API_HEADRES } from './consts/protectedApiHeader';
+import { CreatePostRequest, UpdatePostRequest } from '../types/Posts';
+import { get, post, put } from '../utils/requests';
 
-const API_URL = "api/v1/publicaciones"
-const { REQUESTS_URI } = Constants.expoConfig.extra;
+const complementURL = `publicaciones`
 
+export async function listPost() {
+    return await get(complementURL)
+}
 
-export async function listar() {
-    return await fetch(REQUESTS_URI + API_URL, { method: 'GET', headers: PROTECTED_API_HEADRES })
+export async function createPost(rqBody: CreatePostRequest) {
+    return await post(complementURL, rqBody)
+}
+export async function updatePost(rqBody: UpdatePostRequest) {
+    return await put(complementURL, rqBody)
+}
+
+export async function getSelfPost() {
+    return await get(`${complementURL}/mis-publicaciones`)
+}
+
+export async function getPostById(id: string) {
+    return await get(`${complementURL}/${id}`)
+}
+
+export async function reportPost(id: string, reason: string) {
+    return await post(`${complementURL}/${id}/reportar`, reason)
+}
+
+export async function cancelPost(id: string) {
+    return await post(`${complementURL}/${id}/cancelar`)
+}
+
+export async function getRateByEmail(email: string) {
+    return await get("calificaciones?" + new URLSearchParams({ email: email }).toString())
 }

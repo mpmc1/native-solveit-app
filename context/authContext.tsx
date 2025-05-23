@@ -45,57 +45,33 @@ export const AuthProvider = ({ children }) => {
     }
 
     const signin = async (email, password) => {
-        try {
-            const response = await login(email, password);
-            const json = await response.json();
-            if (response.status >= 200 && response.status < 300 && json.token?.length > 0) {
-                dispatch(setUser({
-                    token: json.token,
-                    username: json.username,
-                    password: password,
-                    email: json.email,
-                    nombreCompleto: json.nombreCompleto,
-                    numeroIdentificacion: json.numeroIdentificacion,
-                    tipoIdentificacion: json.tipoIdentificacion,
-                    descripcionPerfil: json.descripcionPerfil,
-                    telefono: json.telefono
-                }));
-                setIsSessionActive(true);
-                if (Platform.OS === "web") alert("Inicio de sesión exitoso")
-                else Alert.alert("Inicio de sesión", "Inicio de sesión exitoso", [{ text: "OK" }]);
-                router.push("/home");
-            } else {
-                if (Platform.OS === "web") alert(json.message)
-                else Alert.alert("Error al iniciar sesión", json.message, [{ text: "OK" }]);
-            }
+        const response = await login(email, password);
 
-
-        } catch (error) {
-            console.error(error);
-            if (Platform.OS === "web") alert("Hubo un error inesperado. Vuelve a intentarlo")
-            Alert.alert("Hubo un error inesperado.", "Vuelve a intentarlo.");
+        if (response) {
+            dispatch(setUser({
+                token: response.token,
+                username: response.username,
+                password: password,
+                email: response.email,
+                nombreCompleto: response.nombreCompleto,
+                numeroIdentificacion: response.numeroIdentificacion,
+                tipoIdentificacion: response.tipoIdentificacion,
+                descripcionPerfil: response.descripcionPerfil,
+                telefono: response.telefono
+            }));
+            setIsSessionActive(true);
+            if (Platform.OS === "web") alert("Inicio de sesión exitoso")
+            else Alert.alert("Inicio de sesión", "Inicio de sesión exitoso", [{ text: "OK" }]);
+            router.push("/home");
         }
     }
     const signout = async () => {
-        try {
-            const response = await logout();
-            const json = await response.json();
-            console.log(json);
+        const response = await logout();
 
-            if (json.success) {
-                dispatch(clearUser());
-                setIsSessionActive(false);
-                router.push('/')
-            }
-            else {
-                if (Platform.OS === 'web') alert('Error al cerrar sesión: ' + json.message);
-                else Alert.alert('Error al cerrar sesión', json.message);
-            }
-
-        } catch (e) {
-            console.log(e);
-            if (Platform.OS === 'web') alert('Hubo un error inesperado al cerrar sesión');
-            else Alert.alert('Hubo un error inesperado al cerrar sesión');
+        if (response) {
+            dispatch(clearUser());
+            setIsSessionActive(false);
+            router.push('/')
         }
     }
 
