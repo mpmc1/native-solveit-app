@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import { DefaultScreen } from "../../../components/defaultScreen";
 import { GLOBAL_STYLES } from "../../../styles/styles";
-import CustomDropdown from "../../../components/Dropdown/customDorpdown";
-import { createPost } from "../../../services/post";
 import { PostType } from "../../../types/Posts";
 import { ZoneModel } from "../../../types/zone";
 import { getZone } from "../../../services/zone";
 import CustomAlert from "../../../utils/CustomAlert";
+import { createPostRQ } from "../../../services/post";
+import CustomDropdown from "../../../components/Dropdown/customDorpdown";
 
 export default function CreatePost() {
     const [titulo, setTitulo] = useState<string>(null);
@@ -21,8 +21,8 @@ export default function CreatePost() {
     const router = useRouter();
     const navigation = useNavigation();
 
-    const createPost = async () => {
-        const result = await createPost({ categoriaServicio, descripcion, tipoPublicacion, titulo, zonaId });
+    const handleCreatePost = async () => {
+        const result = await createPostRQ({ categoriaServicio, descripcion, tipoPublicacion, titulo, zonaId });
 
         if (result) {
             CustomAlert("Publicación creada con éxito", "Tu publicación ha sido creada exitosamente.", "Tu publicación ha sido creada exitosamente.");
@@ -100,7 +100,7 @@ export default function CreatePost() {
                             withId={true}
                             isZone={true}
                         />
-                        <Pressable style={GLOBAL_STYLES.button} onPress={createPost}>
+                        <Pressable style={GLOBAL_STYLES.button} onPress={handleCreatePost}>
                             <Text style={GLOBAL_STYLES.buttonText}>Crear publicación</Text>
                         </Pressable>
                     </View>

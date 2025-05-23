@@ -7,7 +7,7 @@ export async function listPost() {
     return await get(complementURL)
 }
 
-export async function createPost(rqBody: CreatePostRequest) {
+export async function createPostRQ(rqBody: CreatePostRequest) {
     return await post(complementURL, rqBody)
 }
 export async function updatePost(rqBody: UpdatePostRequest) {
