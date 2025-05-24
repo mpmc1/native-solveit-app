@@ -1,4 +1,4 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput, TouchableOpacity, Image, Platform } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput, Platform } from "react-native";
 import { PostModelResponse, PostStatus } from "../../../types/Posts";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
@@ -6,8 +6,13 @@ import React, { useEffect, useState } from "react";
 import CustomDropdown from "../../../components/Dropdown/customDorpdown";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { getPostById } from "../../../services/post";
-import { getZoneById } from "../../../services/zone";
-import { ZoneModel } from "../../../types/zone";
+import { createRequest } from "../../../services/request";
+import { CreateRequestRQ } from "../../../types/request";
+import CustomAlert from "../../../utils/CustomAlert";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/user/userStore";
+import { jwtDecode } from "jwt-decode";
+import RateModal from "../../../components/rateModal";
 
 export default function PostDetail() {
     const [reportModalVisible, setReportModalVisible] = useState(false);
@@ -15,18 +20,18 @@ export default function PostDetail() {
     const [reportReason, setReportReason] = useState("");
     const [ratingModalVisible, setRatingModalVisible] = useState(false);
     const [post, setPost] = useState<PostModelResponse>(null);
-    const [rating, setRating] = useState(0);
-    const [zona, setZona] = useState<ZoneModel>(null);
+    const [requestDescription, setRequestDescription] = useState<string>(null);
+    const [myToken, setMyToken] = useState<string>(null);
+    const [showRequestModal, setShowRequestModal] = useState<boolean>(null);
 
 
     const { id } = useLocalSearchParams<{ id: string }>();
+    const { token } = useSelector((state: RootState) => state.UserData)
     const navigation = useNavigation();
 
     const getPost = React.useCallback(async () => {
         const response = await getPostById(id);
         setPost(response);
-        const responseZone = await getZoneById(response.zonaId);
-        setZona(responseZone);
     }, [id]);
 
     function openReportModal() {
@@ -41,36 +46,37 @@ export default function PostDetail() {
         setRatingModalVisible(true);
     }
 
-    function closeRatingModal() {
-        setRatingModalVisible(false);
-        setRating(0);
-    }
-
-    function handleSetRating(value: number) {
-        setRating(value);
-    }
-
-    function handleSubmitRating() {
-        if (Platform.OS === 'web') alert(`Calificación enviada: ${rating} estrellas`)
-        else Alert.alert("¡Gracias!", `Calificación enviada: ${rating} estrellas`);
-        closeRatingModal();
+    const handleGenerateRequest = async () => {
+        const bodyRequest: CreateRequestRQ = {
+            descripcion: requestDescription,
+            publicacionId: id,
+            titulo: post.titulo,
+        }
+        const response = createRequest(bodyRequest);
+        if (response) {
+            CustomAlert("Solicitud generada", "Tu solicitud ha sido generada con éxito", "Tu solicitud ha sido generada con éxito");
+        }
     }
 
 
     useEffect(() => {
         const focus = navigation.addListener('focus', () => {
+            const decodedToken = jwtDecode(token);
+            //@ts-ignore
+            setMyToken(decodedToken.UserId);
+
             getPost();
         });
 
         return focus;
-    }, [navigation, getPost]);
+    }, [navigation, getPost, token]);
 
 
 
     return (
         <DefaultScreen>
             <ScrollView>
-                {post && zona &&
+                {post &&
                     <View style={styles.card}>
                         <Text style={styles.title}>{post.titulo}</Text>
                         <Text style={styles.label}>Descripción:</Text>
@@ -83,7 +89,7 @@ export default function PostDetail() {
                         <Text style={styles.label}>Categoría:</Text>
                         <Text style={styles.text}>{post.categoriaServicio}</Text>
                         <Text style={styles.label}>Zona:</Text>
-                        <Text style={styles.text}>{`${zona.ciudad || zona.municipio || zona.corregimiento}, ${zona.departamento}, ${zona.pais}`}</Text>
+                        <Text style={styles.text}>{post.ubicacionCompleta}</Text>
                         <Text style={styles.label}>Estado:</Text>
                         <Text style={styles.text}>{PostStatus[post.estado]}</Text>
                         <Text style={styles.label}>Creado:</Text>
@@ -98,63 +104,76 @@ export default function PostDetail() {
                                 </Pressable>
                             </View>
                         )}
-                        {/* {id !== post.usuarioId && post.estado === PostStatus.PUBLICADA && ( */}
-                        <View style={styles.buttonContainer}>
-                            <Pressable style={GLOBAL_STYLES.button} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
-                            <View style={{ height: 10 }} />
-                            <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
-                        </View>
-                        {/* {id === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
-                        <View style={styles.buttonContainer}>
-                            <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} ><Text style={GLOBAL_STYLES.buttonText}> Eliminar publicación </Text></Pressable>
-                        </View>)
-                    } */}
+                        {Number(myToken) !== post.usuarioId && post.estado === PostStatus.PUBLICADA && (
+                            <View style={styles.buttonContainer}>
+                                <Pressable style={GLOBAL_STYLES.button} onPress={() => setShowRequestModal(true)} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
+                                <View style={{ height: 10 }} />
+                                <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={openReportModal} ><Text style={GLOBAL_STYLES.buttonText}> Reportar publicación </Text></Pressable>
+                            </View>)}
+                        {Number(myToken) === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
+                            <View style={styles.buttonContainer}>
+                                <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} ><Text style={GLOBAL_STYLES.buttonText}> Eliminar publicación </Text></Pressable>
+                            </View>)
+                        }
                     </View>
                 }
             </ScrollView>
             <Modal
-                visible={ratingModalVisible}
+                visible={!!showRequestModal}
                 animationType="slide"
                 transparent={true}
-                onRequestClose={closeRatingModal}
+                onRequestClose={() => setShowRequestModal(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={styles.ratingModalContent}>
-                        <Text style={{ fontWeight: "bold", fontSize: 18, marginBottom: 16, textAlign: "center" }}>
-                            Califica el servicio
+                    <View style={{
+                        backgroundColor: "#fff",
+                        borderRadius: 10,
+                        padding: 20,
+                        width: "85%",
+                        elevation: 5
+                    }}>
+                        <Text style={{ fontWeight: "bold", fontSize: 18, marginBottom: 10 }}>
+                            Descripción de tu solicitud
                         </Text>
-                        <View style={styles.starsRow}>
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <TouchableOpacity key={star} onPress={() => handleSetRating(star)}>
-                                    <Image
-                                        source={
-                                            rating >= star
-                                                ? require("../../../assets/star-filled.png")
-                                                : require("../../../assets/star-outline.png")
-                                        }
-                                        style={styles.starIcon}
-                                    />
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 24 }}>
+                        <TextInput
+                            style={{
+                                borderWidth: 1,
+                                borderColor: "#e3e4e8",
+                                backgroundColor: "#ebeded",
+                                borderRadius: 6,
+                                minHeight: 80,
+                                padding: 10,
+                                marginBottom: 20,
+                                textAlignVertical: "top"
+                            }}
+                            multiline
+                            numberOfLines={4}
+                            placeholder="Escribe aquí tu solicitud..."
+                            value={requestDescription}
+                            onChangeText={setRequestDescription}
+                        />
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Pressable
                                 style={[GLOBAL_STYLES.button, { flex: 1, marginRight: 8 }]}
-                                onPress={handleSubmitRating}
-                                disabled={rating === 0}
-                            >
-                                <Text style={GLOBAL_STYLES.buttonText}>Calificar</Text>
-                            </Pressable>
-                            <Pressable
-                                style={[GLOBAL_STYLES.button, { backgroundColor: "#aaa", flex: 1, marginLeft: 8 }]}
-                                onPress={closeRatingModal}
+                                onPress={() => setShowRequestModal(false)}
                             >
                                 <Text style={GLOBAL_STYLES.buttonText}>Cancelar</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[GLOBAL_STYLES.button, { flex: 1, marginLeft: 8 }]}
+                                onPress={() => {
+                                    handleGenerateRequest();
+                                    setShowRequestModal(false);
+                                }}
+                                disabled={!requestDescription}
+                            >
+                                <Text style={GLOBAL_STYLES.buttonText}>Generar</Text>
                             </Pressable>
                         </View>
                     </View>
                 </View>
             </Modal>
+            <RateModal ratingModalVisible={ratingModalVisible} setRatingModalVisible={setRatingModalVisible}></RateModal>
             <Modal
                 visible={reportModalVisible}
                 animationType="slide"
@@ -267,24 +286,5 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0,0,0,0.4)",
         justifyContent: "center",
         alignItems: "center"
-    },
-    ratingModalContent: {
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        padding: 24,
-        width: "85%",
-        elevation: 5,
-        alignItems: "center"
-    },
-    starsRow: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        marginVertical: 8,
-    },
-    starIcon: {
-        width: 40,
-        height: 40,
-        marginHorizontal: 4,
     },
 });

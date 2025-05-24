@@ -1,20 +1,64 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { connectChat, disconnectChat, sendMessage as sendMessageWS } from "../../../services/chat";
+import { useLocalSearchParams } from "expo-router";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/user/userStore";
+import { jwtDecode } from "jwt-decode";
 
 export default function Chat() {
-    const [messages, setMessages] = useState([
-        { id: 1, text: "¡Hola! ¿En qué puedo ayudarte?", fromMe: false },
-        { id: 2, text: "Hola, tengo una duda sobre tu publicación.", fromMe: true },
-    ]);
-    const [input, setInput] = useState("");
+    const { chat: recipient } = useLocalSearchParams<{ chat: string }>();
     const scrollViewRef = useRef<ScrollView>(null);
+    const [messages, setMessages] = useState<any[]>([]);
+    const [userId, setUserId] = useState<string>("");
+    const [input, setInput] = useState("");
+    const user = useSelector((state: RootState) => state.UserData);
+
+    useEffect(() => {
+
+        if (!user?.token) return;
+        const decodedToken = jwtDecode(user.token);
+        //@ts-ignore
+        setUserId(decodedToken.UserId);
+        connectChat(
+            userId,
+            (msg) => {
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: Date.now() + Math.random(),
+                        text: msg.content,
+                        fromMe: msg.sender === userId,
+                    },
+                ]);
+                setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+            }
+        );
+        return () => {
+            disconnectChat();
+        };
+    }, [user?.token, userId]);
 
     const sendMessage = () => {
         if (input.trim() === "") return;
-        setMessages([...messages, { id: Date.now(), text: input, fromMe: true }]);
+        sendMessageWS({
+            sender: userId,
+            recipient,
+            content: input,
+        });
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: Date.now() + Math.random(),
+                text: input,
+                fromMe: true,
+            },
+        ]);
         setInput("");
         setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -34,9 +78,9 @@ export default function Chat() {
                         contentContainerStyle={styles.messagesContainer}
                         onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
                     >
-                        {messages.map((msg) => (
+                        {messages.map((msg, idx) => (
                             <View
-                                key={msg.id}
+                                key={msg.id || idx}
                                 style={[
                                     styles.messageBubble,
                                     msg.fromMe ? styles.myMessage : styles.otherMessage,
@@ -74,7 +118,7 @@ const styles = StyleSheet.create({
     },
     messagesContainer: {
         width: 340,
-        minHeight: 400,
+        height: "auto",
     },
     messageBubble: {
         maxWidth: "80%",

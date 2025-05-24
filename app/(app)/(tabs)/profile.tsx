@@ -11,10 +11,14 @@ import PolicyModal from "../../../components/Profile/policyModal";
 import UserInfoUpdateModal from "../../../components/Profile/userInfoUpdateModal";
 import { getSelfPost } from "../../../services/post";
 import { userStore } from "../../../redux/user/userStore";
+import { listMyRequests } from "../../../services/request";
+import { RequestResponseModel, RequestsStates } from "../../../types/requests";
+import { PostModelResponse } from "../../../types/Posts";
 
 export default function Profile() {
     const user = userStore.getState().UserData;
-    const [posts, setPosts] = useState([])
+    const [myPosts, setMyPosts] = useState<PostModelResponse[]>(null)
+    const [myRequests, setMyRequests] = useState<RequestResponseModel[]>(null)
     const [policyModalVisible, setPolicyModalVisible] = useState(false);
     const [policyForm, setPolicyForm] = useState({
         numeroPoliza: "",
@@ -38,13 +42,19 @@ export default function Profile() {
     });
     const [formEditable, setFormEditable] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    
+
     const navigation = useNavigation();
     const { signout } = useAuth();
 
     const getMyPosts = async () => {
-            const result = await getSelfPost();
-            setPosts(result)
+        const result = await getSelfPost();
+        setMyPosts(result)
+
+    }
+    const getMyRequests = async () => {
+        const result = await listMyRequests();
+        setMyRequests(result);
+
     }
     const handleDeleteAccount = () => {
         setDropdownVisible(false);
@@ -72,15 +82,16 @@ export default function Profile() {
         setPolicyModalVisible(true);
     };
 
-    
-        useEffect(() => {
-                const focus = navigation.addListener('focus', () => {
-                    getMyPosts();
-                });
-        
-        
-                return focus;
-            }, [navigation]);
+
+    useEffect(() => {
+        const focus = navigation.addListener('focus', () => {
+            getMyPosts();
+            getMyRequests();
+        });
+
+
+        return focus;
+    }, [navigation]);
 
 
     return (
@@ -113,38 +124,38 @@ export default function Profile() {
                                 </View>
                             )}
                         </View>
-                </View>
-                <View style={{zIndex:-1}}> 
-                    <View style={styles.avatarContainer}>
-                        <Image
-                            source={require("../../../assets/avatar-default.png")}
-                            style={styles.avatar}
-                            resizeMode="cover"
+                    </View>
+                    <View style={{ zIndex: -1 }}>
+                        <View style={styles.avatarContainer}>
+                            <Image
+                                source={require("../../../assets/avatar-default.png")}
+                                style={styles.avatar}
+                                resizeMode="cover"
+                            />
+                        </View>
+                        <Text style={styles.username}>{user.username}</Text>
+                        <Text>Descripción</Text>
+                        <TextInput
+                            style={[GLOBAL_STYLES.input, { width: "100%" }]}
+                            value={user.descripcionPerfil || "No ingresada"}
+                            editable={false}
+                        />
+                        <Text>Teléfono</Text>
+                        <TextInput
+                            style={[GLOBAL_STYLES.input, { width: "100%" }]}
+                            value={user.telefono || "No ingresado"}
+                            editable={false}
+                        />
+                        <Text>Ubicación</Text>
+                        <TextInput
+                            style={[GLOBAL_STYLES.input, { width: "100%" }]}
+                            value={"No ingresada"}
+                            editable={false}
                         />
                     </View>
-                    <Text style={styles.username}>{user.username}</Text>
-                    <Text style={styles.label}>Descripción</Text>
-                    <TextInput
-                        style={[GLOBAL_STYLES.input, { width: "100%" }]}
-                        value={user.descripcionPerfil || "No ingresada"}
-                        editable={false}
-                    />
-                    <Text style={styles.label}>Teléfono</Text>
-                    <TextInput
-                        style={[GLOBAL_STYLES.input, { width: "100%" }]}
-                        value={user.telefono || "No ingresado"}
-                        editable={false}
-                    />
-                    <Text style={styles.label}>Ubicación</Text>
-                    <TextInput
-                        style={[GLOBAL_STYLES.input, { width: "100%" }]}
-                        value={"No ingresada"}
-                        editable={false}
-                    />
                 </View>
-            </View>
                 <ExpansionPanel title="Tus publicaciones">
-                    {posts && posts.length > 0 ? posts.map((post) => (
+                    {myPosts && myPosts?.length > 0 ? myPosts.map((post) => (
                         <Link key={post.id} href={`/post/${post.id}`} style={{ width: "100%", marginBottom: 10 }} asChild>
                             <Pressable style={styles.postPressable} >
                                 <View style={{ marginBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee", paddingBottom: 8 }}>
@@ -162,17 +173,14 @@ export default function Profile() {
                     )) : <Text style={{ textAlign: "center", fontSize: 16 }}>No has hecho publicaciones</Text>}
                 </ExpansionPanel>
                 <ExpansionPanel title="Solicitudes enviadas">
-                    {posts && posts.length > 0 ? posts.map((post) => (
-                        <Link key={post.id} href={`/post/${post.id}`} style={{ width: "100%", marginBottom: 10 }} asChild>
+                    {myRequests && myRequests.length > 0 ? myRequests.map((post) => (
+                        <Link key={post.id} href={`/request/${post.id}`} style={{ width: "100%", marginBottom: 10 }} asChild>
                             <Pressable style={styles.postPressable} >
                                 <View style={{ marginBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee", paddingBottom: 8 }}>
                                     <Text style={{ fontWeight: "bold", fontSize: 16 }}>{post.titulo}</Text>
                                     <Text style={{ marginBottom: 8, marginTop: 8 }}>{post.descripcion.length < 120 ? post.descripcion : post.descripcion.slice(0, 120) + '...'}</Text>
                                     <Text style={{ fontSize: 12, color: "#888" }}>
-                                        {post.categoriaServicio} • {post.ubicacionCompleta}
-                                    </Text>
-                                    <Text style={{ fontSize: 12, color: "#888" }}>
-                                        Estado: {["PUBLICADA", "INTERES_RECIBIDO", "EN_PROCESO", "COMPLETADA", "RECHAZADA", "REPORTADA", "BLOQUEADA", "CANCELADA"][post.estado]}
+                                        Estado: {RequestsStates[post.estado]}
                                     </Text>
                                 </View>
                             </Pressable>
@@ -198,14 +206,14 @@ const styles = StyleSheet.create({
     avatarContainer: {
         alignItems: "center",
         marginBottom: 16,
-        zIndex:0
+        zIndex: 0
     },
     avatar: {
         width: 80,
         height: 80,
         borderRadius: 40,
         backgroundColor: "#e0e0e0",
-        zIndex:0
+        zIndex: 0
     },
     username: {
         fontSize: 22,
@@ -227,7 +235,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
-        elevation: 3, 
+        elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,

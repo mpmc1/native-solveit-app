@@ -1,6 +1,9 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import CustomDropdown from "../Dropdown/customDorpdown";
 import { GLOBAL_STYLES } from "../../styles/styles";
+import { UpdateUserRQ } from "../../types/user";
+import { updateUserInfo } from "../../services/user";
+import CustomAlert from "../../utils/CustomAlert";
 
 type Props = {
     editProfileModalVisible: boolean,
@@ -15,16 +18,7 @@ type Props = {
         descripcionPerfil: string;
         telefono: string;
     }
-    setEditProfileForm: React.Dispatch<React.SetStateAction<{
-        nombreCompleto: string;
-        email: string;
-        currentPassword: string;
-        newPassword: string;
-        numeroIdentificacion: string;
-        tipoIdentificacion: string;
-        descripcionPerfil: string;
-        telefono: string;
-    }>>
+    setEditProfileForm: React.Dispatch<React.SetStateAction<UpdateUserRQ>>
 
 };
 
@@ -37,7 +31,6 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
         setEditProfileModalVisible(false);
         setEditProfileForm({
             nombreCompleto: "",
-            email: "",
             currentPassword: "",
             newPassword: "",
             numeroIdentificacion: "",
@@ -48,11 +41,28 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
     };
 
     const handleEditProfileSave = () => {
-        // Aquí puedes agregar la lógica para guardar los cambios
+        if (Object.entries(editProfileForm).some(([key, value]) => key !== "descripcionPerfil" && !value)) {
+            CustomAlert("Error", "Por favor, complete todos los campos.", "Por favor, complete todos los campos.")
+        }
+        if (editProfileForm.newPassword.length < 8) {
+            CustomAlert("Error", "La nueva contraseña debe tener al menos 8 caracteres.", "La nueva contraseña debe tener al menos 8 caracteres.")
+        }
+        const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+
+        const isValidPassword = regex.test(editProfileForm.newPassword);
+        if (!isValidPassword) {
+            CustomAlert("Error", "La nueva contraseña debe contener al menos una letra mayúscula, un número y un carácter especial.", "La nueva contraseña debe contener al menos una letra mayúscula, un número y un carácter especial.");
+        }
+
+        const response = updateUserInfo(editProfileForm);
+        if (response) {
+            CustomAlert("Éxito", "Información actualizada correctamente.", "Información actualizada correctamente.");
+        } else {
+            CustomAlert("Error", "No se pudo actualizar la información.", "No se pudo actualizar la información.");
+        }
         setEditProfileModalVisible(false);
         setEditProfileForm({
             nombreCompleto: "",
-            email: "",
             currentPassword: "",
             newPassword: "",
             numeroIdentificacion: "",

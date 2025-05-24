@@ -37,7 +37,6 @@ export default function Home() {
                 <TextInput placeholder="Buscar" value={searchValue} style={styles.searchInput} inputMode="text" onChangeText={setSearchValue} />
             </View>
             <View style={styles.content}>
-                <Link href="/chat/0">Ir a chat</Link>
                 <Text style={[GLOBAL_STYLES.title, { marginTop: 20 }]}>Publicaciones disponibles</Text>
 
                 {posts && posts.length > 0 ? (

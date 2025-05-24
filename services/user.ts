@@ -8,5 +8,5 @@ export async function rateUser() {
 }
 
 export async function updateUserInfo(body: UpdateUserRQ) {
-    return await put(`${complementURL}/calificar`, body);
+    return await put(`${complementURL}/perfil`, body);
 }

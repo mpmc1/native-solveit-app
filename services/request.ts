@@ -9,7 +9,7 @@ export async function createRequest(body: CreateRequestRQ) {
 export async function listRecievedRequests() {
     return await get(`${complementURL}/mis-publicaciones`);
 }
-export async function listSendRequests() {
+export async function listMyRequests() {
     return await get(`${complementURL}/mis-solicitud`);
 }
 export async function listRequestsByPostId(postId: string) {
@@ -19,11 +19,11 @@ export async function getRequestById(requestId: string) {
     return await get(`${complementURL}/${requestId}`);
 }
 export async function acceptRequest(requestId: string) {
-    return await get(`${complementURL}/${requestId}/aceptar`);
+    return await post(`${complementURL}/${requestId}/aceptar`);
 }
 export async function rejectRequest(requestId: string) {
-    return await get(`${complementURL}/${requestId}/rechazar`);
+    return await post(`${complementURL}/${requestId}/rechazar`);
 }
 export async function finishRequest(requestId: string) {
-    return await get(`${complementURL}/${requestId}/finalizar`);
+    return await post(`${complementURL}/${requestId}/finalizar`);
 }

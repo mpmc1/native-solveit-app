@@ -23,6 +23,7 @@ export interface PostModelResponse {
     estado: PostStatus,
     fechaCreacion: string,
     fechaActualizacion: string,
+    ubicacionCompleta: string,
 }
 
 export enum PostStatus {
