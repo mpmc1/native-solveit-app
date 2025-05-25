@@ -57,7 +57,8 @@ export const AuthProvider = ({ children }) => {
                 numeroIdentificacion: response.numeroIdentificacion,
                 tipoIdentificacion: response.tipoIdentificacion,
                 descripcionPerfil: response.descripcionPerfil,
-                telefono: response.telefono
+                telefono: response.telefono,
+                role: response.role
             }));
             setIsSessionActive(true);
             if (Platform.OS === "web") alert("Inicio de sesión exitoso")

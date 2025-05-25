@@ -37,20 +37,19 @@ export default function RequestDetail() {
             const postResp = await getPostById(req.publicacionId);
             setPost(postResp);
             if (postResp) {
-                if (Number(myId) === post.usuarioId) {
-                    setRecipient(request.usuarioInteresadoId);
+                if (Number(myId) === postResp.usuarioId) {
+                    setRecipient(req.usuarioInteresadoId);
                 } else {
-                    setRecipient(post.usuarioId.toString());
+                    setRecipient(postResp.usuarioId.toString());
                 }
             }
             setLoading(false);
         }
-    }, [id, token, myId, post?.usuarioId, request?.usuarioInteresadoId]);
+    }, [id, token, myId]);
 
     useEffect(() => {
-        fetchData();
-        const focus = navigation.addListener('focus', fetchData);
-        return focus;
+        const unsubscribe = navigation.addListener('focus', fetchData);
+        return unsubscribe;
     }, [navigation, fetchData]);
 
     const handleAcceptRequest = async () => {
@@ -154,7 +153,7 @@ export default function RequestDetail() {
                     )}
                 </View>
             </ScrollView>
-            <RateModal ratingModalVisible={ratingModalVisible} setRatingModalVisible={setRatingModalVisible}></RateModal>
+            <RateModal ratingModalVisible={ratingModalVisible} setRatingModalVisible={setRatingModalVisible} userId={post.usuarioId}></RateModal>
         </DefaultScreen>
     );
 }

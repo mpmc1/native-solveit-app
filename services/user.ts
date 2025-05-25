@@ -3,8 +3,8 @@ import { post, put } from '../utils/requests';
 
 const complementURL = 'usuarios'
 
-export async function rateUser() {
-    return await post(`${complementURL}/calificar`);
+export async function rateUser(body: { id: number, calificacion: number }) {
+    return await post(`${complementURL}/calificar`, body);
 }
 
 export async function updateUserInfo(body: UpdateUserRQ) {

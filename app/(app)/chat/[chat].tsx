@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, use } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
@@ -26,12 +26,13 @@ export default function Chat() {
         connectChat(
             userId,
             (msg) => {
+
                 setMessages((prev) => [
                     ...prev,
                     {
                         id: Date.now() + Math.random(),
                         text: msg.content,
-                        fromMe: msg.sender === userId,
+                        fromMe: Number(msg.sender) === Number(userId),
                     },
                 ]);
                 setTimeout(() => {

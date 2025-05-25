@@ -11,6 +11,7 @@ export interface UserDataModel {
     tipoIdentificacion: string,
     descripcionPerfil: string,
     telefono: string,
+    role: string
 }
 
 const initialState: UserDataModel = {
@@ -23,6 +24,7 @@ const initialState: UserDataModel = {
     tipoIdentificacion: null,
     descripcionPerfil: null,
     telefono: null,
+    role: null
 };
 
 export const UserData = createSlice({

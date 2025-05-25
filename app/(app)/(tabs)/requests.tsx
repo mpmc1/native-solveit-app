@@ -5,13 +5,11 @@ import { useEffect, useState } from "react";
 import { acceptRequest, finishRequest, listRecievedRequests, rejectRequest } from "../../../services/request";
 import { Link, useNavigation } from "expo-router";
 import { RequestResponseModel, RequestsStates } from "../../../types/requests";
-import RateModal from "../../../components/rateModal";
 import CustomAlert from "../../../utils/CustomAlert";
 
 export default function Requests() {
 
     const [requests, setRequests] = useState<RequestResponseModel[]>(null);
-    const [ratingModalVisible, setRatingModalVisible] = useState(false);
 
     const navigation = useNavigation();
 
@@ -96,20 +94,12 @@ export default function Requests() {
                                         </View>
                                     </>
                                 )}
-                                {request.estado === RequestsStates.COMPLETADO && (
-                                    <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 10, }}>
-                                        <Pressable style={[GLOBAL_STYLES.button]} onPress={() => setRatingModalVisible(true)}>
-                                            <Text style={GLOBAL_STYLES.buttonText}>Calificar</Text>
-                                        </Pressable>
-                                    </View>
-                                )}
 
                             </View>
                         </Pressable>
                     </Link>
                 ))}
             </ScrollView>
-            <RateModal ratingModalVisible={ratingModalVisible} setRatingModalVisible={setRatingModalVisible}></RateModal>
         </DefaultScreen>
     );
 }

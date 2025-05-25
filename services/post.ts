@@ -23,7 +23,7 @@ export async function getPostById(id: string) {
 }
 
 export async function reportPost(id: string, reason: string) {
-    return await post(`${complementURL}/${id}/reportar`, reason)
+    return await post(`${complementURL}/${id}/reportar`, { motivo: reason })
 }
 
 export async function cancelPost(id: string) {

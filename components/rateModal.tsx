@@ -2,13 +2,15 @@ import { Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } fro
 import { GLOBAL_STYLES } from "../styles/styles";
 import CustomAlert from "../utils/CustomAlert";
 import { useState } from "react";
+import { rateUser } from "../services/user";
 
 interface Props {
     ratingModalVisible: boolean;
     setRatingModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+    userId?: number;
 }
 
-export default function RateModal({ ratingModalVisible, setRatingModalVisible }: Props) {
+export default function RateModal({ ratingModalVisible, setRatingModalVisible, userId }: Props) {
 
     const [rating, setRating] = useState(0);
 
@@ -21,9 +23,12 @@ export default function RateModal({ ratingModalVisible, setRatingModalVisible }:
         setRating(value);
     }
 
-    function handleSubmitRating() {
-        CustomAlert("Gracias!", `Calificación enviada: ${rating} estrellas`, `Calificación enviada: ${rating} estrellas`)
-        closeRatingModal();
+    const handleSubmitRating = async () => {
+        const response = await rateUser({ id: userId, calificacion: rating })
+        if (response) {
+            CustomAlert("Gracias!", `Calificación enviada: ${rating} estrellas`, `Calificación enviada: ${rating} estrellas`)
+            closeRatingModal();
+        }
     }
 
     return (

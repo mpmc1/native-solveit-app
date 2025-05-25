@@ -17,3 +17,9 @@ export interface RequestResponseModel {
     tituloPublicacion: string;
     usuarioInteresadoId: string;
 }
+
+export interface CreateRequestRQ {
+    publicacionId: string,
+    titulo: string,
+    descripcion: string
+}

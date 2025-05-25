@@ -1,24 +1,22 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput, Platform } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View, Modal, TextInput } from "react-native";
 import { PostModelResponse, PostStatus } from "../../../types/Posts";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
 import React, { useEffect, useState } from "react";
 import CustomDropdown from "../../../components/Dropdown/customDorpdown";
-import { useLocalSearchParams, useNavigation } from "expo-router";
-import { getPostById } from "../../../services/post";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { cancelPost, getPostById, reportPost } from "../../../services/post";
 import { createRequest } from "../../../services/request";
-import { CreateRequestRQ } from "../../../types/request";
 import CustomAlert from "../../../utils/CustomAlert";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/user/userStore";
 import { jwtDecode } from "jwt-decode";
-import RateModal from "../../../components/rateModal";
+import { CreateRequestRQ } from "../../../types/requests";
 
 export default function PostDetail() {
     const [reportModalVisible, setReportModalVisible] = useState(false);
     const [reportDescription, setReportDescription] = useState(null);
     const [reportReason, setReportReason] = useState("");
-    const [ratingModalVisible, setRatingModalVisible] = useState(false);
     const [post, setPost] = useState<PostModelResponse>(null);
     const [requestDescription, setRequestDescription] = useState<string>(null);
     const [myToken, setMyToken] = useState<string>(null);
@@ -28,6 +26,7 @@ export default function PostDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const { token } = useSelector((state: RootState) => state.UserData)
     const navigation = useNavigation();
+    const router = useRouter();
 
     const getPost = React.useCallback(async () => {
         const response = await getPostById(id);
@@ -42,9 +41,6 @@ export default function PostDetail() {
         setReportModalVisible(false);
         setReportDescription("");
     }
-    function openRatingModal() {
-        setRatingModalVisible(true);
-    }
 
     const handleGenerateRequest = async () => {
         const bodyRequest: CreateRequestRQ = {
@@ -58,9 +54,26 @@ export default function PostDetail() {
         }
     }
 
+    const handleCancelPost = async () => {
+        const response = await cancelPost(id);
+        if (response) {
+            CustomAlert("Publicación eliminada", "Tu publicación ha sido eliminada con éxito", "Tu publicación ha sido eliminada con éxito");
+            router.push("/home");
+        }
+    }
+
+    const handleReportPost = async () => {
+
+        const response = await reportPost(post.id.toString(), reportDescription)
+
+        if (response) CustomAlert("Reporte enviado", "Gracias por ayudarnos a mantener la comunidad segura", "Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.");
+        closeReportModal();
+    }
+
 
     useEffect(() => {
         const focus = navigation.addListener('focus', () => {
+
             const decodedToken = jwtDecode(token);
             //@ts-ignore
             setMyToken(decodedToken.UserId);
@@ -97,13 +110,6 @@ export default function PostDetail() {
                         <Text style={styles.label}>Actualizado:</Text>
                         <Text style={styles.text}>{new Date(post.fechaActualizacion).toLocaleDateString()}</Text>
                         <View style={{ height: 10 }} />
-                        {post.estado === PostStatus.COMPLETADA && (
-                            <View style={styles.buttonContainer}>
-                                <Pressable style={GLOBAL_STYLES.button} onPress={openRatingModal}>
-                                    <Text style={GLOBAL_STYLES.buttonText}> Calificar </Text>
-                                </Pressable>
-                            </View>
-                        )}
                         {Number(myToken) !== post.usuarioId && post.estado === PostStatus.PUBLICADA && (
                             <View style={styles.buttonContainer}>
                                 <Pressable style={GLOBAL_STYLES.button} onPress={() => setShowRequestModal(true)} ><Text style={GLOBAL_STYLES.buttonText}> Generar solicitud </Text></Pressable>
@@ -112,7 +118,7 @@ export default function PostDetail() {
                             </View>)}
                         {Number(myToken) === post.usuarioId && post.estado === PostStatus.PUBLICADA && (
                             <View style={styles.buttonContainer}>
-                                <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} ><Text style={GLOBAL_STYLES.buttonText}> Eliminar publicación </Text></Pressable>
+                                <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#ff194b" }]} onPress={handleCancelPost}><Text style={GLOBAL_STYLES.buttonText}> Eliminar publicación </Text></Pressable>
                             </View>)
                         }
                     </View>
@@ -173,7 +179,6 @@ export default function PostDetail() {
                     </View>
                 </View>
             </Modal>
-            <RateModal ratingModalVisible={ratingModalVisible} setRatingModalVisible={setRatingModalVisible}></RateModal>
             <Modal
                 visible={reportModalVisible}
                 animationType="slide"
@@ -221,11 +226,7 @@ export default function PostDetail() {
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Pressable
                                 style={[GLOBAL_STYLES.button, { flex: 1, marginRight: 8 }]}
-                                onPress={() => {
-                                    if (Platform.OS === "web") alert("Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.");
-                                    else Alert.alert("Reporte enviado", "Gracias por ayudarnos a mantener la comunidad segura.");
-                                    closeReportModal();
-                                }}
+                                onPress={handleReportPost}
                             >
                                 <Text style={GLOBAL_STYLES.buttonText}>Enviar reporte</Text>
                             </Pressable>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Image, StyleSheet, Pressable, ScrollView, TouchableOpacity } from "react-native";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { DefaultScreen } from "../../../components/defaultScreen";
-import { Link, useNavigation } from "expo-router";
+import { Link, useNavigation, useRouter } from "expo-router";
 import ExpansionPanel from "../../../components/expansion-panel/expansionPanel";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -10,25 +10,17 @@ import { useAuth } from "../../../context/authContext";
 import PolicyModal from "../../../components/Profile/policyModal";
 import UserInfoUpdateModal from "../../../components/Profile/userInfoUpdateModal";
 import { getSelfPost } from "../../../services/post";
-import { userStore } from "../../../redux/user/userStore";
+import { RootState, userStore } from "../../../redux/user/userStore";
 import { listMyRequests } from "../../../services/request";
 import { RequestResponseModel, RequestsStates } from "../../../types/requests";
 import { PostModelResponse } from "../../../types/Posts";
+import { useSelector } from "react-redux";
 
 export default function Profile() {
     const user = userStore.getState().UserData;
     const [myPosts, setMyPosts] = useState<PostModelResponse[]>(null)
     const [myRequests, setMyRequests] = useState<RequestResponseModel[]>(null)
     const [policyModalVisible, setPolicyModalVisible] = useState(false);
-    const [policyForm, setPolicyForm] = useState({
-        numeroPoliza: "",
-        aseguradora: "",
-        valorPrima: "",
-        fechaEmision: "",
-        fechaVencimiento: "",
-        tipoPoliza: "",
-        archivo: null,
-    });
     const [editProfileModalVisible, setEditProfileModalVisible] = useState(false);
     const [editProfileForm, setEditProfileForm] = useState({
         nombreCompleto: "",
@@ -40,9 +32,10 @@ export default function Profile() {
         descripcionPerfil: "",
         telefono: "",
     });
-    const [formEditable, setFormEditable] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
+    const { role } = useSelector((state: RootState) => state.UserData);
+    const router = useRouter();
     const navigation = useNavigation();
     const { signout } = useAuth();
 
@@ -56,10 +49,10 @@ export default function Profile() {
         setMyRequests(result);
 
     }
-    const handleDeleteAccount = () => {
-        setDropdownVisible(false);
-        // lógica para eliminar cuenta
-        alert("Función de eliminar cuenta");
+    const handleGoToAdminReports = () => {
+        if (role === "ADMIN") {
+            router.push("/manage-reports");
+        }
     };
 
     const handleEditProfile = () => {
@@ -118,9 +111,11 @@ export default function Profile() {
                                     <TouchableOpacity style={styles.dropdownItem} onPress={handleEditProfile}>
                                         <Text style={{ color: "#222" }}>Editar información del perfil</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.dropdownItem} onPress={handleDeleteAccount}>
-                                        <Text style={{ color: "red", fontWeight: "bold" }}>Eliminar cuenta</Text>
-                                    </TouchableOpacity>
+                                    {role && role === "ADMIN" &&
+                                        <TouchableOpacity style={styles.dropdownItem} onPress={handleGoToAdminReports}>
+                                            <Text style={{ color: "red", fontWeight: "bold" }}>Gestión de reportes (Admin)</Text>
+                                        </TouchableOpacity>
+                                    }
                                 </View>
                             )}
                         </View>
@@ -188,11 +183,8 @@ export default function Profile() {
                     )) : <Text style={{ textAlign: "center", fontSize: 16 }}>No has hecho publicaciones</Text>}
                 </ExpansionPanel>
             </ScrollView>
-            <PolicyModal formEditable={formEditable}
-                policyForm={policyForm}
+            <PolicyModal
                 policyModalVisible={policyModalVisible}
-                setFormEditable={setFormEditable}
-                setPolicyForm={setPolicyForm}
                 setPolicyModalVisible={setPolicyModalVisible} />
             <UserInfoUpdateModal setEditProfileForm={setEditProfileForm}
                 editProfileForm={editProfileForm}
