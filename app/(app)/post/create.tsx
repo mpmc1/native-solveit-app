@@ -77,29 +77,32 @@ export default function CreatePost() {
                             onChangeText={setDescripcion}
                             multiline
                         />
-
-                        <CustomDropdown
-                            options={[PostType.OFERTA, PostType.DEMANDA]}
-                            selected={tipoPublicacion}
-                            onSelect={(value) => setTipoPublicacion(value)}
-                            placeholder="Tipo de publicación"
-                        />
-
-                        <CustomDropdown
-                            options={['Jardinería', 'Hogar']}
-                            selected={categoriaServicio}
-                            onSelect={(value) => setCategoriaServicio(value)}
-                            placeholder="Categoría de servicio"
-                        />
-
-                        <CustomDropdown
-                            options={zonas}
-                            selected={zonaId}
-                            onSelect={(value) => setZonaId(value)}
-                            placeholder="Ubicación"
-                            withId={true}
-                            isZone={true}
-                        />
+                        <View style={{ position: "relative", zIndex: 30, overflow: 'visible' }}>
+                            <CustomDropdown
+                                options={[PostType.OFERTA, PostType.DEMANDA]}
+                                selected={tipoPublicacion}
+                                onSelect={(value) => setTipoPublicacion(value)}
+                                placeholder="Tipo de publicación"
+                            />
+                        </View>
+                        <View style={{ position: "relative", zIndex: 20, overflow: 'visible' }}>
+                            <CustomDropdown
+                                options={['Jardinería', 'Hogar']}
+                                selected={categoriaServicio}
+                                onSelect={(value) => setCategoriaServicio(value)}
+                                placeholder="Categoría de servicio"
+                            />
+                        </View>
+                        <View style={{ position: "relative", zIndex: 10, overflow: 'visible' }}>
+                            <CustomDropdown
+                                options={zonas}
+                                selected={zonaId}
+                                onSelect={(value) => setZonaId(value)}
+                                placeholder="Ubicación"
+                                withId={true}
+                                isZone={true}
+                            />
+                        </View>
                         <Pressable style={GLOBAL_STYLES.button} onPress={handleCreatePost}>
                             <Text style={GLOBAL_STYLES.buttonText}>Crear publicación</Text>
                         </Pressable>

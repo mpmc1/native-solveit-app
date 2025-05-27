@@ -199,12 +199,14 @@ export default function PostDetail() {
                         elevation: 5
                     }}>
                         <Text style={{ fontWeight: "bold", fontSize: 18, marginBottom: 10 }}>Razón</Text>
-                        <CustomDropdown
-                            options={['Spam', 'Estafa', 'Otro']}
-                            selected={reportReason}
-                            onSelect={(value) => setReportReason(value)}
-                            placeholder="Escoge una razón"
-                        />
+                        <View style={{ position: "relative", zIndex: 10, overflow: 'visible' }}>
+                            <CustomDropdown
+                                options={['Spam', 'Estafa', 'Otro']}
+                                selected={reportReason}
+                                onSelect={(value) => setReportReason(value)}
+                                placeholder="Escoge una razón"
+                            />
+                        </View>
                         <Text style={{ fontWeight: "bold", fontSize: 18, marginBottom: 10 }}>Descripción</Text>
                         <TextInput
                             style={{

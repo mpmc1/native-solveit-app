@@ -124,12 +124,14 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
                             placeholder="Número de identificación"
                         />
                         <Text style={styles.label}>Tipo de identificación</Text>
-                        <CustomDropdown
-                            options={['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'PPT', 'PEP', 'DIE']}
-                            selected={editProfileForm.tipoIdentificacion}
-                            onSelect={(value) => handleEditProfileInput("tipoIdentificacion", value)}
-                            placeholder="Tipo de identificación"
-                        />
+                        <View style={{ position: "relative", zIndex: 10, overflow: 'visible' }}>
+                            <CustomDropdown
+                                options={['Cédula de ciudadanía', 'Cédula de extranjería', 'Pasaporte', 'PPT', 'PEP', 'DIE']}
+                                selected={editProfileForm.tipoIdentificacion}
+                                onSelect={(value) => handleEditProfileInput("tipoIdentificacion", value)}
+                                placeholder="Tipo de identificación"
+                            />
+                        </View>
                         <Text style={styles.label}>Descripción del perfil</Text>
                         <TextInput
                             style={[GLOBAL_STYLES.input, { width: "100%" }]}

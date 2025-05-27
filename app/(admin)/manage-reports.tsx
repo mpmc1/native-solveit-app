@@ -4,6 +4,7 @@ import { adminList, disablePost, enablePost } from "../../services/report";
 import { ReportRS } from "../../types/report";
 import { GLOBAL_STYLES } from "../../styles/styles";
 import CustomAlert from "../../utils/CustomAlert";
+import { DefaultScreen } from "../../components/defaultScreen";
 
 export default function ManageReports() {
     const [reportList, setReportsList] = useState<ReportRS[]>(null);
@@ -44,14 +45,15 @@ export default function ManageReports() {
                     <Text style={GLOBAL_STYLES.buttonText}>Dar de baja</Text>
                 </Pressable>
                 <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "#4CAF50" }]} onPress={() => handleEnable(item.publicacionId)}>
-                    <Text style={GLOBAL_STYLES.buttonText}>Habliitar</Text>
+                    <Text style={GLOBAL_STYLES.buttonText}>Habilitar</Text>
                 </Pressable>
             </View>
         </View>
     );
 
     return (
-        <View style={[GLOBAL_STYLES.card, { minWidth: 400, height: "95%", justifyContent: "center", alignItems: "center", alignSelf: "center", marginTop: 16, backgroundColor: "#ffffffed" }]}>
+        <DefaultScreen>
+            <Text style={[GLOBAL_STYLES.title, { marginTop: 16 }]}>Administrar Reportes</Text>
             <FlatList
                 style={{ width: "100%" }}
                 data={reportList}
@@ -60,7 +62,7 @@ export default function ManageReports() {
                 contentContainerStyle={GLOBAL_STYLES.card}
                 ListEmptyComponent={<Text>No hay reportes.</Text>}
             />
-        </View>
+        </DefaultScreen>
     );
 }
 

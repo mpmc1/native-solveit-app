@@ -51,7 +51,7 @@ export default function Profile() {
     }
     const handleGoToAdminReports = () => {
         if (role === "ADMIN") {
-            router.push("/manage-reports");
+            router.push("/(admin)/manage-reports");
         }
     };
 
