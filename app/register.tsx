@@ -52,7 +52,7 @@ export default function Register() {
         if (password !== confirmPassword) {
             const differentPasswordsAlertTitle = "Las contraseñas no coinciden."
             const differentPasswordsAlertMessage = "Por favor, verifica e intenta de nuevo.";
-            CustomAlert(differentPasswordsAlertTitle, differentPasswordsAlertMessage, differentPasswordsAlertMessage);
+            CustomAlert(differentPasswordsAlertTitle, differentPasswordsAlertMessage, differentPasswordsAlertTitle);
             return;
         }
         const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
