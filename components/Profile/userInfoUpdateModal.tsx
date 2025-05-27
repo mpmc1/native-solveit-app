@@ -31,7 +31,7 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
     };
 
     const dispatch = useDispatch();
-    const { token, username, role } = useSelector((state: RootState) => state.UserData);
+    const { token, username, email, role } = useSelector((state: RootState) => state.UserData);
 
     const handleEditProfileCancel = () => {
         setEditProfileModalVisible(false);
@@ -69,7 +69,7 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
                 role: role,
                 token: token,
                 nombreCompleto: editProfileForm.nombreCompleto,
-                email: editProfileForm.email,
+                email: email,
                 numeroIdentificacion: editProfileForm.numeroIdentificacion,
                 tipoIdentificacion: editProfileForm.tipoIdentificacion,
                 descripcionPerfil: editProfileForm.descripcionPerfil,
@@ -109,15 +109,6 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
                             value={editProfileForm.nombreCompleto}
                             onChangeText={v => handleEditProfileInput("nombreCompleto", v)}
                             placeholder="Nombre completo"
-                        />
-                        <Text style={styles.label}>Email</Text>
-                        <TextInput
-                            style={[GLOBAL_STYLES.input, { width: "100%" }]}
-                            value={editProfileForm.email}
-                            onChangeText={v => handleEditProfileInput("email", v)}
-                            placeholder="Email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
                         />
                         <Text style={styles.label}>Contraseña actual</Text>
                         <TextInput
