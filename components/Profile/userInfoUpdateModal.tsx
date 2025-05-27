@@ -4,6 +4,9 @@ import { GLOBAL_STYLES } from "../../styles/styles";
 import { UpdateUserRQ } from "../../types/user";
 import { updateUserInfo } from "../../services/user";
 import CustomAlert from "../../utils/CustomAlert";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../redux/user/userSlice";
+import { RootState } from "../../redux/user/userStore";
 
 type Props = {
     editProfileModalVisible: boolean,
@@ -27,6 +30,9 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
         setEditProfileForm({ ...editProfileForm, [field]: value });
     };
 
+    const dispatch = useDispatch();
+    const { token, username, role } = useSelector((state: RootState) => state.UserData);
+
     const handleEditProfileCancel = () => {
         setEditProfileModalVisible(false);
         setEditProfileForm({
@@ -40,7 +46,7 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
         });
     };
 
-    const handleEditProfileSave = () => {
+    const handleEditProfileSave = async () => {
         if (Object.entries(editProfileForm).some(([key, value]) => key !== "descripcionPerfil" && !value)) {
             CustomAlert("Error", "Por favor, complete todos los campos.", "Por favor, complete todos los campos.")
         }
@@ -54,8 +60,21 @@ export default function UserInfoUpdateModal({ editProfileForm, setEditProfileFor
             CustomAlert("Error", "La nueva contraseña debe contener al menos una letra mayúscula, un número y un carácter especial.", "La nueva contraseña debe contener al menos una letra mayúscula, un número y un carácter especial.");
         }
 
-        const response = updateUserInfo(editProfileForm);
-        if (response) {
+        const response = await updateUserInfo(editProfileForm);
+
+        if (response && response.success === true) {
+            dispatch(setUser({
+                username: username,
+                password: editProfileForm.newPassword,
+                role: role,
+                token: token,
+                nombreCompleto: editProfileForm.nombreCompleto,
+                email: editProfileForm.email,
+                numeroIdentificacion: editProfileForm.numeroIdentificacion,
+                tipoIdentificacion: editProfileForm.tipoIdentificacion,
+                descripcionPerfil: editProfileForm.descripcionPerfil,
+                telefono: editProfileForm.telefono,
+            }))
             CustomAlert("Éxito", "Información actualizada correctamente.", "Información actualizada correctamente.");
         } else {
             CustomAlert("Error", "No se pudo actualizar la información.", "No se pudo actualizar la información.");

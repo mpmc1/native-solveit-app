@@ -54,6 +54,7 @@ export default function PolicyModal({ setPolicyModalVisible, policyModalVisible 
             setFormEditable(true);
         } else {
             const response = policyId ? await updatePolicy(policyId.toString(), policyForm, archivo) : await createPolicy(policyForm, archivo);
+
             if (response) {
                 CustomAlert("Éxito", "Póliza guardada correctamente", "Póliza guardada correctamente");
                 setFormEditable(false);

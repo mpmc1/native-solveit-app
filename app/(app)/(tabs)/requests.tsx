@@ -42,6 +42,7 @@ export default function Requests() {
     };
 
     useEffect(() => {
+        getRequestsList();
         const focus = navigation.addListener('focus', () => {
             getRequestsList();
         });
@@ -49,7 +50,7 @@ export default function Requests() {
         return focus;
     }, [navigation]);
     return (
-        <DefaultScreen hasTab={true}>
+        <DefaultScreen>
             <ScrollView contentContainerStyle={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Text style={GLOBAL_STYLES.title}>Solicitudes recibidas</Text>
                 {!requests || requests.length === 0 && (
@@ -58,16 +59,20 @@ export default function Requests() {
                     </View>
                 )}
                 {requests && requests.length > 0 && requests.map((request, index) => (
-                    <Link key={index} href={`/request/${request.id}`} style={{ width: "100%", marginBottom: 10 }} asChild>
-                        <Pressable style={styles.requestPressable} >
+                    <View key={index} style={{ width: "100%", marginBottom: 10 }}>
+                        <View style={styles.requestPressable} >
                             <View style={{ marginBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee", paddingBottom: 8 }}>
-                                <Text style={{ fontWeight: "bold", fontSize: 16 }}>{request.titulo}</Text>
-                                <Text style={{ marginBottom: 8, marginTop: 8 }}>{request.descripcion.length < 120 ? request.descripcion : request.descripcion.slice(0, 120) + '...'}</Text>
-                                <Text style={{ fontSize: 12, color: "#888" }}>
-                                    Estado: {RequestsStates[request.estado]}
-                                </Text>
-                                <Text style={{ fontSize: 12, color: "#888" }}>Hecha por: {request.nombreUsuarioInteresado}</Text>
-                                <Text style={{ fontSize: 12, color: "#888" }}>Fecha de creación: {new Date(request.fechaCreacion).toLocaleDateString()}</Text>
+                                <Link href={`/request/${request.id}`} asChild>
+                                    <Pressable>
+                                        <Text style={{ fontWeight: "bold", fontSize: 16 }}>{request.titulo}</Text>
+                                        <Text style={{ marginBottom: 8, marginTop: 8 }}>{request.descripcion.length < 120 ? request.descripcion : request.descripcion.slice(0, 120) + '...'}</Text>
+                                        <Text style={{ fontSize: 12, color: "#888" }}>
+                                            Estado: {RequestsStates[request.estado]}
+                                        </Text>
+                                        <Text style={{ fontSize: 12, color: "#888" }}>Hecha por: {request.nombreUsuarioInteresado}</Text>
+                                        <Text style={{ fontSize: 12, color: "#888" }}>Fecha de creación: {new Date(request.fechaCreacion).toLocaleDateString()}</Text>
+                                    </Pressable>
+                                </Link>
                                 {request.estado === RequestsStates.PENDIENTE && (
                                     <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginTop: 10, }}>
                                         <Pressable style={[GLOBAL_STYLES.button, { backgroundColor: "red" }]} onPress={() => handleRejectRequest(request.id)}>
@@ -96,8 +101,8 @@ export default function Requests() {
                                 )}
 
                             </View>
-                        </Pressable>
-                    </Link>
+                        </View>
+                    </View>
                 ))}
             </ScrollView>
         </DefaultScreen>

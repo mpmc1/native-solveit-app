@@ -16,8 +16,14 @@ export async function get(urlComplement: string) {
 }
 
 export async function post(urlComplement: string, body?: any, headers?: HeadersInit, convertToJson = true) {
-    const response = await fetch(requestUri + urlComplement, { method: 'POST', body: convertToJson ? JSON.stringify(body) : body, headers: headers ? { ...getProtectedHeaders(true), ...headers } : getProtectedHeaders() });
-    return await responseCleaning(response);
+    try {
+        const response = await fetch(requestUri + urlComplement, { method: 'POST', body: convertToJson ? JSON.stringify(body) : body, headers: headers ? { ...headers } : getProtectedHeaders() });
+        return await responseCleaning(response);
+
+    } catch (error) {
+        console.log(error);
+
+    }
 }
 
 export async function put(urlComplement: string, body: any, headers?: HeadersInit, convertToJson = true) {
@@ -38,6 +44,7 @@ async function responseCleaning(response: Response) {
         return;
     }
     try {
+
         const json = await response.json();
         if (response.status >= 200 && response.status < 300) {
             return json;

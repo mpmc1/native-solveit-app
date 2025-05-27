@@ -1,16 +1,17 @@
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 import { Link, useNavigation } from "expo-router";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Constants from "expo-constants";
 import { GLOBAL_STYLES } from "../../../styles/styles";
 import { PostCard } from "../../../components/PostCard";
-import { PostModel } from "../../../types/Posts";
+import { PostModel, PostType } from "../../../types/Posts";
 import { listPost } from "../../../services/post";
+import CustomDropdown from "../../../components/Dropdown/customDorpdown";
 
 export default function Home() {
     const [posts, setPosts] = useState<PostModel[]>(null);
-    const [searchValue, setSearchValue] = useState(null);
+    const [searchValue, setSearchValue] = useState('Todo');
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -21,8 +22,9 @@ export default function Home() {
         return focus;
     }, [navigation]);
 
-    const getPostsList = async () => {
-        const response = await listPost();
+    const getPostsList = async (postType?: PostType) => {
+        setSearchValue(postType || 'Todo');
+        const response = await listPost(postType);
 
         if (response) {
             setPosts(response);
@@ -34,7 +36,21 @@ export default function Home() {
     return (
         <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', paddingTop: Constants.statusBarHeight }}>
             <View style={styles.topBar}>
-                <TextInput placeholder="Buscar" value={searchValue} style={styles.searchInput} inputMode="text" onChangeText={setSearchValue} />
+                <View style={{ position: "relative", zIndex: 30, overflow: 'visible', marginTop: 10 }}>
+                    <CustomDropdown
+                        options={['Todo', 'OFERTA', 'DEMANDA']}
+                        onSelect={(value) => {
+                            if (value === 'Todo') {
+                                getPostsList();
+                            } else {
+                                getPostsList(value as PostType);
+                            }
+                        }}
+                        selected={searchValue}
+                        placeholder="Seleccionar tipo de publicación"
+
+                    />
+                </View>
             </View>
             <View style={styles.content}>
                 <Text style={[GLOBAL_STYLES.title, { marginTop: 20 }]}>Publicaciones disponibles</Text>
@@ -79,6 +95,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: "100%",
         borderRadius: 10,
+        zIndex: -1
     },
     container: {
         padding: 12,

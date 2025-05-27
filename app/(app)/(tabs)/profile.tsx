@@ -180,7 +180,7 @@ export default function Profile() {
                                 </View>
                             </Pressable>
                         </Link>
-                    )) : <Text style={{ textAlign: "center", fontSize: 16 }}>No has hecho publicaciones</Text>}
+                    )) : <Text style={{ textAlign: "center", fontSize: 16 }}>No has hecho solicitudes</Text>}
                 </ExpansionPanel>
             </ScrollView>
             <PolicyModal

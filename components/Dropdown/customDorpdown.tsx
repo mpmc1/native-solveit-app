@@ -39,7 +39,7 @@ const CustomDropdown = ({ options = [], selected, onSelect, placeholder = 'Selec
                         {options.map((item, idx) => (
                             <Pressable key={idx} style={styles.option} onPress={() => handleSelect(item)}>
                                 {isZone
-                                    ? <Text>{item.ciudad || item.municipio || item.corregmiento}, {item.departamento}, {item.pais}</Text>
+                                    ? <Text>{item.corregimiento}, {item.ciudad}, {item.departamento}, {item.pais}</Text>
                                     : <Text>{item}</Text>
                                 }
                             </Pressable>

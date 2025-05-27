@@ -1,10 +1,11 @@
-import { CreatePostRequest, UpdatePostRequest } from '../types/Posts';
+import { CreatePostRequest, PostType, UpdatePostRequest } from '../types/Posts';
 import { get, post, put } from '../utils/requests';
 
 const complementURL = `publicaciones`
 
-export async function listPost() {
-    return await get(complementURL)
+export async function listPost(postTipe: PostType = null) {
+    const params = postTipe ? `?tipoPublicacion=${postTipe}` : '';
+    return await get(complementURL + params)
 }
 
 export async function createPostRQ(rqBody: CreatePostRequest) {

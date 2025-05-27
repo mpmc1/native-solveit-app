@@ -2,6 +2,7 @@ import { CreatePolicyRQ } from "../types/policy";
 import { del, get, post, put } from "../utils/requests";
 import { requestUri } from "./const/constants";
 import { getProtectedHeaders } from "../utils/protectedApiHeader";
+import CustomAlert from "../utils/CustomAlert";
 
 const complementURL = "polizas"
 
@@ -45,9 +46,10 @@ export async function deletePolicy(id) {
 }
 
 export async function downloadPolicy(id: string) {
-    return await fetch(`${requestUri}${complementURL}/${id}/descargar`, { method: 'GET', headers: getProtectedHeaders(true) }).then(response => {
+    return await fetch(`${requestUri}${complementURL}/${id}/descargar`, { method: 'GET', headers: getProtectedHeaders(true) }).then(async (response) => {
         if (!response.ok) {
-            throw new Error("Error al descargar el archivo");
+            const json = await response.json();
+            CustomAlert("Error al descargar la póliza", json.message || "No se pudo descargar la póliza", json.message);
         }
 
         // Extraer nombre de archivo del header
