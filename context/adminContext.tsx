@@ -12,8 +12,6 @@ export const AdminProvider = ({ children }) => {
 
     const checkRole = useCallback(async () => {
         if (role === undefined || role === null) return;
-        console.log(role);
-
         if (role !== "ADMIN") {
             router.back();
         }

@@ -16,8 +16,6 @@ export async function get(urlComplement: string) {
 }
 
 export async function post(urlComplement: string, body?: any, headers?: HeadersInit, convertToJson = true) {
-    console.log(requestUri);
-
     const response = await fetch(requestUri + urlComplement, { method: 'POST', body: convertToJson ? JSON.stringify(body) : body, headers: headers ? { ...getProtectedHeaders(true), ...headers } : getProtectedHeaders() });
     return await responseCleaning(response);
 }

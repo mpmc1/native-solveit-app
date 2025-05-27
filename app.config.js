@@ -34,7 +34,7 @@ export default {
       eas: {
         projectId: "2e04cafa-122c-4904-9c42-1035ecb1a856"
       },
-      REQUESTS_URI: process.env.REQUESTS_URI,
+      EXPO_PUBLIC_REQUESTS_URI: process.env.EXPO_PUBLIC_REQUESTS_URI,
     },
     owner: "carlospuerta"
   },

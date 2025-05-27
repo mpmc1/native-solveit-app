@@ -7,7 +7,7 @@ export async function adminList() {
 }
 
 export async function disablePost(postId: string) {
-    return await post(`${complementURL}/publicacion/${postId}/cancelar`);
+    return await post(`${complementURL}/publicacion/${postId}/bloquear`);
 }
 
 export async function enablePost(postId: string) {
