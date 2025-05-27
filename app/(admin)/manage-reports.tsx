@@ -23,7 +23,7 @@ export default function ManageReports() {
     const handleDisable = async (postId: number) => {
         const response = await disablePost(postId.toString())
         if (response) {
-            CustomAlert("Éxito", "Se inhabilitó la publicación", "Se hablilitó la publicación")
+            CustomAlert("Éxito", "Se inhabilitó la publicación", "Se inhabilitó la publicación")
         }
     };
 
