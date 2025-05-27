@@ -30,7 +30,7 @@ export default function ManageReports() {
     const handleEnable = async (postId: number) => {
         const response = await enablePost(postId.toString())
         if (response) {
-            CustomAlert("Éxito", "Se habilitó la publicación", "Se inhablilitó la publicación")
+            CustomAlert("Éxito", "Se habilitó la publicación", "Se habilitó la publicación")
         }
     };
 
