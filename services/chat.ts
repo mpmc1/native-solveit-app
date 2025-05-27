@@ -1,7 +1,6 @@
 import SockJS from "sockjs-client";
 import { Client, IMessage } from "@stomp/stompjs";
-
-const WS_URL = "http://192.168.20.29:9595/ws";
+import { requestUri } from "./const/constants";
 
 let stompClient: Client | null = null;
 
@@ -18,7 +17,7 @@ export function connectChat(
     onConnect?: () => void,
     onDisconnect?: () => void
 ) {
-    const socket = new SockJS(WS_URL);
+    const socket = new SockJS(requestUri.replace("api/v1/", "") + "ws");
 
     stompClient = new Client({
         webSocketFactory: () => socket,
